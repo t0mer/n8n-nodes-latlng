@@ -569,3 +569,80 @@ describe('radius and bias validation', () => {
 		expect(calls[0].options.qs).toMatchObject({ lat: 32.08, lon: 34.78, radius: 800 });
 	});
 });
+
+describe('coverage gaps', () => {
+	const withMapsKey = { apiKey: 'latlng_test', mapsKey: 'pk_latlng_testkey' };
+
+	it('dataset metadata calls /v1/datasets/{id}/metadata', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: { minzoom: 0, maxzoom: 14 } }], {
+			params: { resource: 'dataset', operation: 'getMetadata', datasetId: 'ds_abc123' },
+			credentials: withMapsKey,
+		});
+		const [out] = await run(ctx);
+		expect(calls[0].options).toMatchObject({
+			url: 'https://tiles.latlng.work/v1/datasets/ds_abc123/metadata',
+			qs: { key: 'pk_latlng_testkey' },
+		});
+		expect(out[0].json).toEqual({ minzoom: 0, maxzoom: 14 });
+	});
+
+	it('continueOnFail turns validation and network errors into error items', async () => {
+		const { ctx } = fakeCtx([new Error('getaddrinfo ENOTFOUND api.latlng.work')], {
+			params: [
+				{ resource: 'geocoding', operation: 'reverse', latitude: 99, longitude: 0 },
+				{ resource: 'geocoding', operation: 'reverse', latitude: 1, longitude: 2 },
+			],
+			continueOnFail: true,
+		});
+		const [out] = await run(ctx);
+		expect(out).toEqual([
+			{ json: { error: expect.stringMatching(/^Latitude must be/) }, pairedItem: { item: 0 } },
+			{
+				// n8n substitutes its own wording for DNS failures.
+				json: {
+					error: expect.stringMatching(/Could not reach LatLng|connection cannot be established/),
+				},
+				pairedItem: { item: 1 },
+			},
+		]);
+	});
+
+	it('rate limit info keeps the binary data on static maps and tiles', async () => {
+		const headers = { 'x-ratelimit-limit': '3000', 'x-ratelimit-remaining': '42' };
+		const map = fakeCtx([{ statusCode: 200, headers, body: Buffer.from('png') }], {
+			params: {
+				resource: 'staticMap',
+				operation: 'getImage',
+				framing: 'center',
+				latitude: 32,
+				longitude: 34,
+				zoom: 10,
+				width: 100,
+				height: 100,
+				style: 'dark',
+				format: 'png',
+				binaryPropertyName: 'data',
+				options: { includeRateLimit: true },
+			},
+		});
+		const [mapOut] = await run(map.ctx);
+		expect(mapOut[0].binary?.data).toMatchObject({ fileName: 'latlng-map.png' });
+		expect(mapOut[0].json.rateLimit).toEqual({ limit: 3000, remaining: 42 });
+
+		const tile = fakeCtx([{ statusCode: 200, headers, body: Buffer.from('pbf') }], {
+			params: {
+				resource: 'tile',
+				operation: 'getTile',
+				z: 0,
+				x: 0,
+				y: 0,
+				binaryPropertyName: 'data',
+				options: { includeRateLimit: true },
+			},
+			credentials: withMapsKey,
+		});
+		const [tileOut] = await run(tile.ctx);
+		expect(tileOut[0].binary?.data).toMatchObject({ fileName: '0-0-0.pbf' });
+		expect(tileOut[0].json.rateLimit).toEqual({ limit: 3000, remaining: 42 });
+	});
+});
