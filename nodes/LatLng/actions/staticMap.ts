@@ -23,17 +23,22 @@ export const getImage: Handler = async (ctx, i) => {
 		}),
 	);
 	const format = p('format', 'png') as string;
+	const framing = p('framing', 'center') as 'center' | 'bbox';
+	// Only the fields of the chosen framing exist; n8n throws when reading hidden ones.
+	const frame =
+		framing === 'bbox'
+			? {
+					minLatitude: p('minLatitude'),
+					minLongitude: p('minLongitude'),
+					maxLatitude: p('maxLatitude'),
+					maxLongitude: p('maxLongitude'),
+				}
+			: { latitude: p('latitude'), longitude: p('longitude'), zoom: p('zoom', 14) as number };
 	const qs = buildStaticMapQuery(
 		ctx.getNode(),
 		{
-			framing: p('framing', 'center') as 'center' | 'bbox',
-			latitude: p('latitude', undefined),
-			longitude: p('longitude', undefined),
-			zoom: p('zoom', 14) as number,
-			minLatitude: p('minLatitude', undefined),
-			minLongitude: p('minLongitude', undefined),
-			maxLatitude: p('maxLatitude', undefined),
-			maxLongitude: p('maxLongitude', undefined),
+			framing,
+			...frame,
 			width: p('width', 800) as number,
 			height: p('height', 600) as number,
 			style: p('style', 'dark') as string,

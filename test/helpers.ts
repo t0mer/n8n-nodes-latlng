@@ -42,7 +42,10 @@ export function fakeCtx(responses: FakeResponse[] = [], opts: FakeOptions = {}) 
 			const [head, ...rest] = name.split('.');
 			let value: unknown = paramsFor(i)[head];
 			for (const key of rest) value = (value as Record<string, unknown> | undefined)?.[key];
-			return value === undefined ? fallback : value;
+			if (value !== undefined) return value;
+			// Like n8n: a missing parameter without a fallback value throws.
+			if (fallback === undefined) throw new Error(`Could not get parameter "${name}"`);
+			return fallback;
 		},
 		helpers: {
 			httpRequestWithAuthentication: vi.fn(async (type: string, options: IHttpRequestOptions) =>

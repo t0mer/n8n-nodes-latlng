@@ -664,3 +664,27 @@ describe('tile zoom', () => {
 		expect(calls).toHaveLength(0);
 	});
 });
+
+describe('static map framing', () => {
+	it('bounding box framing does not read the hidden center fields', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: Buffer.from('png') }], {
+			params: {
+				resource: 'staticMap',
+				operation: 'getImage',
+				framing: 'bbox',
+				minLatitude: 32.07,
+				minLongitude: 34.77,
+				maxLatitude: 32.09,
+				maxLongitude: 34.79,
+				width: 400,
+				height: 300,
+				style: 'dark',
+				format: 'png',
+				binaryPropertyName: 'data',
+			},
+		});
+		await run(ctx);
+		expect(calls[0].options.qs).toMatchObject({ bbox: '34.77,32.07,34.79,32.09' });
+		expect(calls[0].options.qs).not.toHaveProperty('center');
+	});
+});
