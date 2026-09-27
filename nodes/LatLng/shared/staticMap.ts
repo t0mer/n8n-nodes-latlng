@@ -79,7 +79,10 @@ function intInRange(
 	return n;
 }
 
-/** `lng,lat,color,label` entries joined with `|`. */
+/**
+ * `lng,lat,#color,label` entries joined with `|`. The live API only applies the colour when it
+ * has a leading `#` (the documented bare hex is ignored and the pin is drawn red).
+ */
 export function buildMarkers(node: INode, markers: MarkerInput[], itemIndex: number): string {
 	return markers
 		.map((m, n) => {
@@ -87,7 +90,7 @@ export function buildMarkers(node: INode, markers: MarkerInput[], itemIndex: num
 			const color = normalizeColor(node, m.color, DEFAULT_MARKER_COLOR, itemIndex);
 			// `,` and `|` are separators in the markers syntax.
 			const label = (m.label ?? '').replace(/[,|]/g, ' ').trim();
-			return [toLngLat(point), color, label].filter(Boolean).join(',');
+			return [toLngLat(point), `#${color}`, label].filter(Boolean).join(',');
 		})
 		.join('|');
 }

@@ -392,7 +392,7 @@ describe('static map', () => {
 				height: 500,
 				style: 'light',
 				format: 'png',
-				markers: '34.774,32.0779,e11d48,D',
+				markers: '34.774,32.0779,#e11d48,D',
 				path: ['4:2563eb:0.5|34.774,32.0779|34.7755,32.079'],
 			},
 		});

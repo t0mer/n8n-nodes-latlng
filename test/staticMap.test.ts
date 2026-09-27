@@ -92,7 +92,7 @@ describe('buildStaticMapQuery', () => {
 			},
 			0,
 		);
-		expect(qs.markers).toBe('34.78,32.08,22c55e,A');
+		expect(qs.markers).toBe('34.78,32.08,#22c55e,A');
 		expect(qs.path).toEqual(['3:2563eb:0.8|34.78,32.08|34.79,32.09', '5:ff0000:0.5|2,1|4,3']);
 		expect(qs.geojson).toBe('{"type":"Point","coordinates":[34.78,32.08]}');
 	});
@@ -109,7 +109,7 @@ describe('markers', () => {
 				],
 				0,
 			),
-		).toBe('34.78,32.08,e11d48|34.79,32.09,e11d48,Cafe  Bar X');
+		).toBe('34.78,32.08,#e11d48|34.79,32.09,#e11d48,Cafe  Bar X');
 	});
 
 	it('names the bad marker', () => {
