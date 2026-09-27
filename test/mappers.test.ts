@@ -33,7 +33,27 @@ describe('flattenFeature', () => {
 	});
 });
 
+describe('geometry wins', () => {
+	it('does not let properties override the geometry coordinates', () => {
+		const out = flattenFeature({
+			geometry: { type: 'Point', coordinates: [34.774, 32.0779] },
+			properties: { name: 'X', lat: '1', lon: '2' },
+		});
+		expect(out).toMatchObject({ lat: 32.0779, lon: 34.774 });
+	});
+});
+
 describe('extractors', () => {
+	it('accept a single Feature (reverse geocoding)', () => {
+		expect(
+			extractors.features({
+				type: 'Feature',
+				geometry: { type: 'Point', coordinates: [34.774, 32.0779] },
+				properties: { name: 'Dizengoff Square', city: 'Tel Aviv' },
+			}),
+		).toEqual([{ name: 'Dizengoff Square', lat: 32.0779, lon: 34.774, city: 'Tel Aviv' }]);
+	});
+
 	it('tolerate missing lists', () => {
 		expect(extractors.features({})).toEqual([]);
 		expect(extractors.places({ places: null })).toEqual([]);

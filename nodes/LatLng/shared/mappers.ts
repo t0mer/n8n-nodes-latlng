@@ -8,9 +8,12 @@ const asArray = (value: unknown): IDataObject[] =>
 export function flattenFeature(feature: IDataObject): IDataObject {
 	const properties = (feature.properties ?? {}) as IDataObject;
 	const geometry = feature.geometry as IDataObject | undefined;
-	const out: IDataObject = { name: properties.name };
-	if (geometry?.type === 'Point') Object.assign(out, fromGeoJson(geometry.coordinates));
+	const out: IDataObject = { name: properties.name, lat: undefined, lon: undefined };
 	Object.assign(out, properties);
+	// The geometry is authoritative for the coordinates; properties must not override it.
+	if (geometry?.type === 'Point') Object.assign(out, fromGeoJson(geometry.coordinates));
+	if (out.lat === undefined) delete out.lat;
+	if (out.lon === undefined) delete out.lon;
 	if (geometry && geometry.type !== 'Point') out.geometry = geometry;
 	if (feature.bbox) out.bbox = feature.bbox;
 	if (out.name === undefined) delete out.name;
@@ -19,7 +22,9 @@ export function flattenFeature(feature: IDataObject): IDataObject {
 
 /** Extracts the result list of a response, one flat object per result. */
 export const extractors = {
-	features: (body: IDataObject) => asArray(body.features).map(flattenFeature),
+	/** FeatureCollection, or a single Feature. */
+	features: (body: IDataObject) =>
+		(body.type === 'Feature' ? [body] : asArray(body.features)).map(flattenFeature),
 	places: (body: IDataObject) => asArray(body.places),
 	suggestions: (body: IDataObject) => asArray(body.results),
 	categories: (body: IDataObject) => asArray(body.categories),
