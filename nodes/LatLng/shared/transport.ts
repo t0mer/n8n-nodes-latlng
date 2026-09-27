@@ -4,7 +4,7 @@ import type {
 	IHttpRequestOptions,
 	IN8nHttpFullResponse,
 } from 'n8n-workflow';
-import { sleep } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError, sleep } from 'n8n-workflow';
 import { httpError, networkError } from './errors';
 import { CREDENTIAL_TYPE, DEFAULT_TIMEOUT_MS, HOSTS, type Host } from './hosts';
 
@@ -59,6 +59,7 @@ async function send(
 	itemIndex: number,
 ): Promise<IN8nHttpFullResponse> {
 	const options = buildOptions(req);
+	let failure: unknown;
 	try {
 		return (
 			req.mapsKey
@@ -66,8 +67,11 @@ async function send(
 				: await ctx.helpers.httpRequestWithAuthentication.call(ctx, CREDENTIAL_TYPE, options)
 		) as IN8nHttpFullResponse;
 	} catch (error) {
-		throw networkError(ctx.getNode(), error, itemIndex);
+		failure = error;
 	}
+	// n8n's own errors (e.g. a missing or unreadable credential) are not connectivity problems.
+	if (failure instanceof NodeApiError || failure instanceof NodeOperationError) throw failure;
+	throw networkError(ctx.getNode(), failure, itemIndex);
 }
 
 /** Waits before retry 1 and 2. Kept short: every retry spends quota. */

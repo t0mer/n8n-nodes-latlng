@@ -1,8 +1,8 @@
-import { NodeApiError } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import { describe, expect, it, vi } from 'vitest';
 import { apiMessage } from '../nodes/LatLng/shared/errors';
 import { cleanQs, latlngRequest } from '../nodes/LatLng/shared/transport';
-import { fakeCtx } from './helpers';
+import { fakeCtx, NODE } from './helpers';
 
 vi.mock('n8n-workflow', async (importOriginal) => ({
 	...(await importOriginal<typeof import('n8n-workflow')>()),
@@ -128,5 +128,14 @@ describe('keys in error bodies', () => {
 		const e401 = await latlngRequest(second.ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
 		expect(e401.description).toBe('Invalid API key REDACTED');
 		expect(JSON.stringify(e401)).not.toMatch(/Secret456/);
+	});
+});
+
+describe('n8n errors from the request helper', () => {
+	it('passes them through instead of calling them network failures', async () => {
+		const credentialError = new NodeOperationError(NODE, 'Node does not have any credentials set');
+		const { ctx } = fakeCtx([credentialError]);
+		const error = await latlngRequest(ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
+		expect(error).toBe(credentialError);
 	});
 });
