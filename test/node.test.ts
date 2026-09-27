@@ -342,3 +342,93 @@ describe('rate limit info', () => {
 		expect(plain[0].json).not.toHaveProperty('rateLimit');
 	});
 });
+
+describe('static map', () => {
+	const params = {
+		resource: 'staticMap',
+		operation: 'getImage',
+		framing: 'center',
+		latitude: 32.0779,
+		longitude: 34.774,
+		zoom: 15,
+		width: 800,
+		height: 500,
+		style: 'light',
+		format: 'png',
+		binaryPropertyName: 'map',
+		markers: { marker: [{ latitude: 32.0779, longitude: 34.774, color: '#e11d48', label: 'D' }] },
+		paths: {
+			path: [
+				{
+					weight: 4,
+					color: '#2563eb',
+					opacity: 0.5,
+					points: {
+						point: [
+							{ latitude: 32.0779, longitude: 34.774 },
+							{ latitude: 32.079, longitude: 34.7755 },
+						],
+					},
+				},
+			],
+		},
+	};
+
+	it('returns the image as binary with request params in JSON', async () => {
+		const png = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+		const { ctx, calls } = fakeCtx(
+			[{ statusCode: 200, headers: { 'content-type': 'image/png' }, body: png }],
+			{ params },
+		);
+		const [out] = await run(ctx);
+		expect(calls[0].credentialType).toBe('latLngApi');
+		expect(calls[0].options).toMatchObject({
+			url: 'https://api.latlng.work/v1/static',
+			encoding: 'arraybuffer',
+			qs: {
+				center: '34.774,32.0779',
+				zoom: 15,
+				width: 800,
+				height: 500,
+				style: 'light',
+				format: 'png',
+				markers: '34.774,32.0779,e11d48,D',
+				path: ['4:2563eb:0.5|34.774,32.0779|34.7755,32.079'],
+			},
+		});
+		expect(out[0].binary?.map).toMatchObject({ fileName: 'latlng-map.png', mimeType: 'image/png' });
+		expect(out[0].json).toMatchObject({ center: '34.774,32.0779', fileSize: 4 });
+		expect(JSON.stringify(out[0].json)).not.toMatch(/key/i);
+	});
+
+	it('uses a .jpg name and the format mime type when the header is missing', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 200, body: Buffer.from('jpg') }], {
+			params: { ...params, format: 'jpeg', markers: {}, paths: {} },
+		});
+		const [out] = await run(ctx);
+		expect(out[0].binary?.map).toMatchObject({
+			fileName: 'latlng-map.jpg',
+			mimeType: 'image/jpeg',
+		});
+	});
+
+	it('explains a 400 on a very long request', async () => {
+		const marker = Array.from({ length: 300 }, (_, n) => ({
+			latitude: 32 + n / 1000,
+			longitude: 34.7,
+			label: `M${n}`,
+		}));
+		const { ctx } = fakeCtx([{ statusCode: 400, body: { error: 'Bad Request' } }], {
+			params: { ...params, markers: { marker }, paths: {} },
+		});
+		const error = await run(ctx).catch((e) => e);
+		expect(error.message).toBe('Bad request: Bad Request');
+		expect(error.description).toMatch(/use fewer markers or paths/);
+	});
+
+	it('validates before calling the API', async () => {
+		const { ctx, calls } = fakeCtx([], { params: { ...params, zoom: 25 } });
+		await expect(run(ctx)).rejects.toThrow(/Zoom/);
+		expect(calls).toHaveLength(0);
+	});
+});

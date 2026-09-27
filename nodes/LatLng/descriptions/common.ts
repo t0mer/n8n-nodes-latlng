@@ -16,6 +16,11 @@ export const resourceProperty: INodeProperties = {
 			value: 'place',
 			description: 'Search points of interest by name or proximity',
 		},
+		{
+			name: 'Static Map',
+			value: 'staticMap',
+			description: 'Render a map image with markers, lines and GeoJSON',
+		},
 	],
 	default: 'geocoding',
 };

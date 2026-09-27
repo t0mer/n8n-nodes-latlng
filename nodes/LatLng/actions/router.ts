@@ -3,6 +3,7 @@ import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import type { Handler } from './common';
 import * as geocoding from './geocoding';
 import * as place from './place';
+import * as staticMap from './staticMap';
 
 const HANDLERS: Record<string, Record<string, Handler>> = {
 	geocoding: { forward: geocoding.forward, reverse: geocoding.reverse },
@@ -12,6 +13,7 @@ const HANDLERS: Record<string, Record<string, Handler>> = {
 		nearby: place.nearby,
 		search: place.search,
 	},
+	staticMap: { getImage: staticMap.getImage },
 };
 
 function toNodeError(ctx: IExecuteFunctions, error: unknown, itemIndex: number) {

@@ -9,6 +9,7 @@ import { route } from './actions/router';
 import { optionsCollection, resourceProperty, simplifyProperty } from './descriptions/common';
 import { geocodingFields, geocodingOperations } from './descriptions/GeocodingDescription';
 import { placeFields, placeOperations } from './descriptions/PlaceDescription';
+import { staticMapFields, staticMapOperations } from './descriptions/StaticMapDescription';
 
 export class LatLng implements INodeType {
 	description: INodeTypeDescription = {
@@ -31,6 +32,8 @@ export class LatLng implements INodeType {
 			...geocodingFields,
 			...placeOperations,
 			...placeFields,
+			...staticMapOperations,
+			...staticMapFields,
 			simplifyProperty,
 			optionsCollection,
 		],
