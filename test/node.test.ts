@@ -544,3 +544,28 @@ describe('tile and dataset', () => {
 		expect(JSON.stringify(error)).not.toContain('pk_latlng_testkey');
 	});
 });
+
+describe('radius and bias validation', () => {
+	it.each([20000, -5, 12.5])('rejects nearby radius %s set by an expression', async (radius) => {
+		const { ctx, calls } = fakeCtx([], {
+			params: { resource: 'place', operation: 'nearby', latitude: 32, longitude: 34, radius },
+		});
+		await expect(run(ctx)).rejects.toThrow(
+			/Radius must be a whole number of meters from 1 to 5000/,
+		);
+		expect(calls).toHaveLength(0);
+	});
+
+	it('autosuggest sends the near point unswapped with radius', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: { results: [] } }], {
+			params: {
+				resource: 'place',
+				operation: 'autosuggest',
+				query: 'Di',
+				filters: { latitude: 32.08, longitude: 34.78, radius: 800 },
+			},
+		});
+		await run(ctx);
+		expect(calls[0].options.qs).toMatchObject({ lat: 32.08, lon: 34.78, radius: 800 });
+	});
+});

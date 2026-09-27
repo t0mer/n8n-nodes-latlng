@@ -5,6 +5,24 @@ import { extractors } from '../shared/mappers';
 import { cleanQs, latlngRequest } from '../shared/transport';
 import { getOptions, requiredString, shapeList, type Handler } from './common';
 
+/** Radius in whole meters; UI limits do not apply to expressions or AI-tool calls. */
+export function radiusMeters(
+	ctx: IExecuteFunctions,
+	value: unknown,
+	max: number,
+	i: number,
+): number {
+	const n = Number(value);
+	if (!Number.isInteger(n) || n < 1 || n > max) {
+		throw new NodeOperationError(
+			ctx.getNode(),
+			`Radius must be a whole number of meters from 1 to ${max} (got ${JSON.stringify(value)}) [item ${i}]`,
+			{ itemIndex: i },
+		);
+	}
+	return n;
+}
+
 function getFilters(ctx: IExecuteFunctions, i: number): IDataObject {
 	return ctx.getNodeParameter('filters', i, {}) as IDataObject;
 }
@@ -55,7 +73,7 @@ export const nearby: Handler = async (ctx, i) => {
 	const { timeout } = getOptions(ctx, i);
 	const qs = {
 		...point,
-		radius: ctx.getNodeParameter('radius', i, 1000),
+		radius: radiusMeters(ctx, ctx.getNodeParameter('radius', i, 1000), 5000, i),
 		category: filters.category,
 		limit: ctx.getNodeParameter('maxResults', i, 20),
 	};
@@ -90,7 +108,10 @@ export const autosuggest: Handler = async (ctx, i) => {
 	const qs = {
 		q,
 		...near,
-		radius: filters.radius,
+		radius:
+			filters.radius === undefined
+				? undefined
+				: radiusMeters(ctx, filters.radius, Number.MAX_SAFE_INTEGER, i),
 		country: filters.country,
 		bbox,
 		limit: Math.min(ctx.getNodeParameter('maxResults', i, 5) as number, 20),
