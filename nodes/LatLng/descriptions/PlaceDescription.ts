@@ -145,7 +145,8 @@ export const placeFields: INodeProperties[] = [
 				name: 'boundingBox',
 				type: 'fixedCollection',
 				default: {},
-				description: 'Only suggest places inside this box (decimal degrees)',
+				description:
+					'Only suggest places inside this box (decimal degrees). Boxes crossing the 180° meridian are not supported.',
 				options: [
 					{
 						displayName: 'Box',

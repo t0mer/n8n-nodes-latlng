@@ -53,7 +53,8 @@ export const staticMapFields: INodeProperties[] = [
 			{
 				name: 'Bounding Box',
 				value: 'bbox',
-				description: 'Fit the map to a south-west / north-east box',
+				description:
+					'Fit the map to a south-west / north-east box (boxes crossing the 180° meridian are not supported)',
 			},
 			{
 				name: 'Center and Zoom',
