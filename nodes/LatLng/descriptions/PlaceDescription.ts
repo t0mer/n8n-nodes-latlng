@@ -52,7 +52,7 @@ export const placeOperations: INodeProperties[] = [
 				name: 'Get Categories',
 				value: 'getCategories',
 				description:
-					'List every place category with its number of places, for use in the Category filter',
+					'List every place category (e.g. cafe, restaurant, pharmacy) for use in the Category filter',
 				action: 'Get place categories',
 			},
 			{
