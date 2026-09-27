@@ -35,7 +35,7 @@ describe('redactDeep', () => {
 
 describe('bare and encoded keys', () => {
 	it('redacts bare server and maps keys in free text', () => {
-		expect(redactUrls('Invalid API key latlng_AbC123xyz')).toBe('Invalid API key REDACTED');
+		expect(redactUrls('Invalid API key latlng_Fake1')).toBe('Invalid API key REDACTED');
 		expect(redactUrls('key pk_latlng_Zz9-_q not allowed for domain')).toBe(
 			'key REDACTED not allowed for domain',
 		);

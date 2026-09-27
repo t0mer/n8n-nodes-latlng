@@ -85,7 +85,7 @@ describe('latlngRequest', () => {
 	it('wraps network failures without leaking keys', async () => {
 		const { ctx } = fakeCtx([
 			new Error(
-				'timeout of 10000ms exceeded for https://tiles.latlng.work/v1/metadata?key=pk_latlng_secret123',
+				'timeout of 10000ms exceeded for https://tiles.latlng.work/v1/metadata?key=pk_latlng_Fake4',
 			),
 		]);
 		const error = await latlngRequest(
@@ -95,7 +95,7 @@ describe('latlngRequest', () => {
 		).catch((e) => e);
 		expect(error).toBeInstanceOf(NodeApiError);
 		expect(error.message).toContain('key=REDACTED');
-		expect(error.message).not.toContain('pk_latlng_secret123');
+		expect(error.message).not.toContain('pk_latlng_Fake4');
 	});
 });
 
@@ -118,16 +118,16 @@ describe('cleanQs', () => {
 
 describe('keys in error bodies', () => {
 	it('never shows a key echoed by the API in the message or description', async () => {
-		const { ctx } = fakeCtx([{ statusCode: 400, body: { error: 'bad key latlng_Secret123' } }]);
+		const { ctx } = fakeCtx([{ statusCode: 400, body: { error: 'bad key latlng_Fake2' } }]);
 		const e400 = await latlngRequest(ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
 		expect(e400.message).toBe('Bad request: bad key REDACTED');
 
 		const second = fakeCtx([
-			{ statusCode: 401, body: { message: 'Invalid API key pk_latlng_Secret456' } },
+			{ statusCode: 401, body: { message: 'Invalid API key pk_latlng_Fake3' } },
 		]);
 		const e401 = await latlngRequest(second.ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
 		expect(e401.description).toBe('Invalid API key REDACTED');
-		expect(JSON.stringify(e401)).not.toMatch(/Secret456/);
+		expect(JSON.stringify(e401)).not.toMatch(/Fake3/);
 	});
 });
 
