@@ -1,0 +1,11 @@
+{
+	"node": "@t0mer/n8n-nodes-latlng.latLng",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Data & Storage", "Utility"],
+	"alias": ["geocode", "address", "coordinates", "places", "map", "OpenStreetMap"],
+	"resources": {
+		"credentialDocumentation": [{ "url": "https://www.latlng.work/docs" }],
+		"primaryDocumentation": [{ "url": "https://github.com/t0mer/n8n-nodes-latlng#readme" }]
+	}
+}

@@ -50,7 +50,7 @@
       "dist/credentials/LatLngApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Example/Example.node.js"
+      "dist/nodes/LatLng/LatLng.node.js"
     ]
   },
   "devDependencies": {
