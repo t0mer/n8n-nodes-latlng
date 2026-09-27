@@ -152,3 +152,55 @@ describe('place search and nearby', () => {
 		expect(calls[0].options.qs).not.toHaveProperty('country');
 	});
 });
+
+describe('place autosuggest and categories', () => {
+	it('autosuggest hits the suggest host with bbox in lng,lat order and caps limit at 20', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: { results: [] } }], {
+			params: {
+				resource: 'place',
+				operation: 'autosuggest',
+				query: 'Dizen',
+				maxResults: 50,
+				filters: {
+					country: 'il',
+					boundingBox: { box: { minLat: 32.0, minLon: 34.7, maxLat: 32.1, maxLon: 34.9 } },
+				},
+			},
+		});
+		await run(ctx);
+		expect(calls[0].credentialType).toBe('latLngApi');
+		expect(calls[0].options).toMatchObject({
+			url: 'https://suggest.latlng.work/autosuggest',
+			qs: { q: 'Dizen', country: 'il', bbox: '34.7,32,34.9,32.1', limit: 20 },
+		});
+	});
+
+	it('autosuggest needs 2 characters', async () => {
+		const { ctx } = fakeCtx([], {
+			params: { resource: 'place', operation: 'autosuggest', query: 'D' },
+		});
+		await expect(run(ctx)).rejects.toThrow(/at least 2 characters/);
+	});
+
+	it('autosuggest rejects radius without a near point', async () => {
+		const { ctx } = fakeCtx([], {
+			params: {
+				resource: 'place',
+				operation: 'autosuggest',
+				query: 'Di',
+				filters: { radius: 100 },
+			},
+		});
+		await expect(run(ctx)).rejects.toThrow(/Radius needs/);
+	});
+
+	it('getCategories calls the categories endpoint', async () => {
+		const body = { categories: [{ name: 'cafe', count: 10 }] };
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body }], {
+			params: { resource: 'place', operation: 'getCategories' },
+		});
+		const [out] = await run(ctx);
+		expect(calls[0].options.url).toBe('https://api.latlng.work/v1/places/categories');
+		expect(out[0].json).toEqual(body);
+	});
+});

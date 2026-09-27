@@ -6,7 +6,12 @@ import * as place from './place';
 
 const HANDLERS: Record<string, Record<string, Handler>> = {
 	geocoding: { forward: geocoding.forward, reverse: geocoding.reverse },
-	place: { nearby: place.nearby, search: place.search },
+	place: {
+		autosuggest: place.autosuggest,
+		getCategories: place.getCategories,
+		nearby: place.nearby,
+		search: place.search,
+	},
 };
 
 function toNodeError(ctx: IExecuteFunctions, error: unknown, itemIndex: number) {

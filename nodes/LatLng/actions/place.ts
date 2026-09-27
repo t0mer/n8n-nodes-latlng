@@ -1,6 +1,6 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
-import { validateLatLon } from '../shared/coords';
+import { toBbox, validateLatLon } from '../shared/coords';
 import { latlngRequest } from '../shared/transport';
 import { getOptions, requiredString, type Handler } from './common';
 
@@ -61,6 +61,52 @@ export const nearby: Handler = async (ctx, i) => {
 	const res = await latlngRequest<IDataObject>(
 		ctx,
 		{ host: 'api', path: '/v1/places/nearby', qs, timeout },
+		i,
+	);
+	return [{ json: res.body }];
+};
+
+export const autosuggest: Handler = async (ctx, i) => {
+	const q = requiredString(ctx, 'query', 'Partial Query', i, 2);
+	const filters = getFilters(ctx, i);
+	const near = biasPoint(ctx, filters, i);
+	if (filters.radius !== undefined && near.lat === undefined) {
+		throw new NodeOperationError(
+			ctx.getNode(),
+			`Radius needs Near Latitude and Near Longitude [item ${i}]`,
+			{ itemIndex: i },
+		);
+	}
+	const box = (filters.boundingBox as IDataObject | undefined)?.box as IDataObject | undefined;
+	let bbox: string | undefined;
+	if (box) {
+		const node = ctx.getNode();
+		const min = validateLatLon(node, box.minLat, box.minLon, i, 'Min ');
+		const max = validateLatLon(node, box.maxLat, box.maxLon, i, 'Max ');
+		bbox = toBbox(node, min, max, i);
+	}
+	const { timeout } = getOptions(ctx, i);
+	const qs = {
+		q,
+		...near,
+		radius: filters.radius,
+		country: filters.country,
+		bbox,
+		limit: Math.min(ctx.getNodeParameter('maxResults', i, 5) as number, 20),
+	};
+	const res = await latlngRequest<IDataObject>(
+		ctx,
+		{ host: 'suggest', path: '/autosuggest', qs, timeout },
+		i,
+	);
+	return [{ json: res.body }];
+};
+
+export const getCategories: Handler = async (ctx, i) => {
+	const { timeout } = getOptions(ctx, i);
+	const res = await latlngRequest<IDataObject>(
+		ctx,
+		{ host: 'api', path: '/v1/places/categories', timeout },
 		i,
 	);
 	return [{ json: res.body }];
