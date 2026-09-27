@@ -177,7 +177,8 @@ export const staticMapFields: INodeProperties[] = [
 						type: 'string',
 						default: '',
 						placeholder: 'e.g. A',
-						description: 'Short text shown on the pin',
+						description:
+							'Short text for the pin. The LatLng API currently accepts but does not draw labels.',
 					},
 					lat('Latitude', 'latitude', 'Latitude of the pin, in decimal degrees'),
 					lon('Longitude', 'longitude', 'Longitude of the pin, in decimal degrees'),
@@ -192,7 +193,8 @@ export const staticMapFields: INodeProperties[] = [
 		typeOptions: { multipleValues: true },
 		placeholder: 'Add Path',
 		default: {},
-		description: 'Lines to draw through a series of points',
+		description:
+			'Lines to draw through a series of points. Sent as documented, but the LatLng API currently does not draw them.',
 		displayOptions: { show: show() },
 		options: [
 			{
@@ -251,7 +253,7 @@ export const staticMapFields: INodeProperties[] = [
 		type: 'json',
 		default: '',
 		description:
-			'Optional GeoJSON object (Feature, FeatureCollection or geometry) to draw on the map. Coordinates are [longitude, latitude].',
+			'Optional GeoJSON object (Feature, FeatureCollection or geometry) to draw on the map. Coordinates are [longitude, latitude]. Sent as documented, but the LatLng API currently does not draw it.',
 		displayOptions: { show: show() },
 	},
 	{
