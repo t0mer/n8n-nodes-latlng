@@ -1,8 +1,13 @@
 import { NodeApiError } from 'n8n-workflow';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { apiMessage } from '../nodes/LatLng/shared/errors';
 import { cleanQs, latlngRequest } from '../nodes/LatLng/shared/transport';
 import { fakeCtx } from './helpers';
+
+vi.mock('n8n-workflow', async (importOriginal) => ({
+	...(await importOriginal<typeof import('n8n-workflow')>()),
+	sleep: vi.fn(async () => {}),
+}));
 
 const fail = (statusCode: number, body: unknown = {}) => ({ statusCode, body });
 
@@ -43,7 +48,7 @@ describe('latlngRequest', () => {
 		[403, 'Key not allowed for this endpoint (server vs maps key, or domain restriction)'],
 		[429, 'LatLng quota exceeded; resets daily on the free plan'],
 	])('maps %i to a clear message', async (status, message) => {
-		const { ctx } = fakeCtx([fail(status)]);
+		const { ctx } = fakeCtx([fail(status), fail(status), fail(status)]);
 		const error = await latlngRequest(ctx, { host: 'api', path: '/x' }, 3).catch((e) => e);
 		expect(error).toBeInstanceOf(NodeApiError);
 		expect(error.message).toBe(message);

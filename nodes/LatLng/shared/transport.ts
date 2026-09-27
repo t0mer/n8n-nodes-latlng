@@ -4,6 +4,7 @@ import type {
 	IHttpRequestOptions,
 	IN8nHttpFullResponse,
 } from 'n8n-workflow';
+import { sleep } from 'n8n-workflow';
 import { httpError, networkError } from './errors';
 import { CREDENTIAL_TYPE, DEFAULT_TIMEOUT_MS, HOSTS, type Host } from './hosts';
 
@@ -69,13 +70,26 @@ async function send(
 	}
 }
 
-/** Sends one GET to LatLng and maps any non-2xx status to a NodeApiError. */
+/** Waits before retry 1 and 2. Kept short: every retry spends quota. */
+export const RETRY_DELAYS_MS = [1000, 3000];
+
+export const isRetryable = (statusCode: number) => statusCode === 429 || statusCode >= 500;
+
+/**
+ * Sends a GET to LatLng, retrying 429 and 5xx up to twice, and maps any final non-2xx status
+ * to a NodeApiError.
+ */
 export async function latlngRequest<T = unknown>(
 	ctx: IExecuteFunctions,
 	req: LatLngRequest,
 	itemIndex: number,
 ): Promise<LatLngResponse<T>> {
-	const response = await send(ctx, req, itemIndex);
+	let response = await send(ctx, req, itemIndex);
+	for (const delay of RETRY_DELAYS_MS) {
+		if (!isRetryable(response.statusCode)) break;
+		await sleep(delay);
+		response = await send(ctx, req, itemIndex);
+	}
 	const { statusCode } = response;
 	if (statusCode >= 400) {
 		throw httpError(
