@@ -7,6 +7,7 @@ import type { LatLngResponse } from '../shared/transport';
 export type Handler = (ctx: IExecuteFunctions, itemIndex: number) => Promise<INodeExecutionData[]>;
 
 export interface CommonOptions {
+	includeRateLimit: boolean;
 	language?: string;
 	returnEmptyItem: boolean;
 	timeout: number;
@@ -15,6 +16,7 @@ export interface CommonOptions {
 export function getOptions(ctx: IExecuteFunctions, itemIndex: number): CommonOptions {
 	const options = ctx.getNodeParameter('options', itemIndex, {}) as IDataObject;
 	return {
+		includeRateLimit: options.includeRateLimit === true,
 		language: (options.language as string | undefined)?.trim() || undefined,
 		returnEmptyItem: options.returnEmptyItem === true,
 		timeout: (options.timeout as number | undefined) || DEFAULT_TIMEOUT_MS,
@@ -51,8 +53,31 @@ export function shapeList(
 	query: IDataObject,
 ): INodeExecutionData[] {
 	const simplify = ctx.getNodeParameter('simplify', itemIndex, true) as boolean;
-	if (!simplify) return [{ json: res.body }];
-	const results = extract(res.body ?? {});
-	if (results.length) return results.map((json) => ({ json }));
-	return getOptions(ctx, itemIndex).returnEmptyItem ? [{ json: { found: false, query } }] : [];
+	const options = getOptions(ctx, itemIndex);
+	let items: INodeExecutionData[];
+	if (!simplify) {
+		items = [{ json: res.body }];
+	} else {
+		items = extract(res.body ?? {}).map((json) => ({ json }));
+		if (!items.length && options.returnEmptyItem) items = [{ json: { found: false, query } }];
+	}
+	return options.includeRateLimit ? withRateLimit(items, res.headers) : items;
+}
+
+/** Reads X-RateLimit-Limit / X-RateLimit-Remaining (header names are case-insensitive). */
+export function rateLimitFrom(headers: IDataObject): IDataObject {
+	const read = (name: string) => {
+		const key = Object.keys(headers).find((k) => k.toLowerCase() === name);
+		const value = key === undefined ? undefined : Number(headers[key]);
+		return value === undefined || Number.isNaN(value) ? null : value;
+	};
+	return { limit: read('x-ratelimit-limit'), remaining: read('x-ratelimit-remaining') };
+}
+
+export function withRateLimit(
+	items: INodeExecutionData[],
+	headers: IDataObject,
+): INodeExecutionData[] {
+	const rateLimit = rateLimitFrom(headers);
+	return items.map((item) => ({ ...item, json: { ...item.json, rateLimit } }));
 }

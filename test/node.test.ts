@@ -290,3 +290,55 @@ describe('simplify and empty results', () => {
 		expect(out).toEqual([{ json: featureCollection, pairedItem: { item: 0 } }]);
 	});
 });
+
+describe('rate limit info', () => {
+	it('adds rateLimit from the response headers to every item', async () => {
+		const { ctx } = fakeCtx(
+			[
+				{
+					statusCode: 200,
+					headers: { 'x-ratelimit-limit': '3000', 'x-ratelimit-remaining': '2987' },
+					body: { places: [{ name: 'A' }, { name: 'B' }] },
+				},
+			],
+			{
+				params: {
+					resource: 'place',
+					operation: 'search',
+					query: 'x',
+					options: { includeRateLimit: true },
+				},
+			},
+		);
+		const [out] = await run(ctx);
+		expect(out.map((o) => o.json.rateLimit)).toEqual([
+			{ limit: 3000, remaining: 2987 },
+			{ limit: 3000, remaining: 2987 },
+		]);
+	});
+
+	it('uses null when the headers are missing and is off by default', async () => {
+		const withOption = fakeCtx([{ statusCode: 200, body: { categories: [{ name: 'a' }] } }], {
+			params: {
+				resource: 'place',
+				operation: 'getCategories',
+				options: { includeRateLimit: true },
+			},
+		});
+		const [out] = await run(withOption.ctx);
+		expect(out[0].json.rateLimit).toEqual({ limit: null, remaining: null });
+
+		const without = fakeCtx(
+			[
+				{
+					statusCode: 200,
+					headers: { 'x-ratelimit-limit': '1' },
+					body: { categories: [{ name: 'a' }] },
+				},
+			],
+			{ params: { resource: 'place', operation: 'getCategories' } },
+		);
+		const [plain] = await run(without.ctx);
+		expect(plain[0].json).not.toHaveProperty('rateLimit');
+	});
+});

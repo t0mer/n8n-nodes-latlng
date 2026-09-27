@@ -57,6 +57,14 @@ export const optionsCollection: INodeProperties = {
 	default: {},
 	options: [
 		{
+			displayName: 'Include Rate Limit Info',
+			name: 'includeRateLimit',
+			type: 'boolean',
+			default: false,
+			description:
+				'Whether to add rateLimit.limit and rateLimit.remaining (calls left in the current quota period) to each output item',
+		},
+		{
 			displayName: 'Language',
 			name: 'language',
 			type: 'string',
