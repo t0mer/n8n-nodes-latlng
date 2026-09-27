@@ -67,6 +67,15 @@ export const optionsCollection: INodeProperties = {
 			displayOptions: { show: { '/resource': ['geocoding'], '/operation': ['forward'] } },
 		},
 		{
+			displayName: 'Return Empty Item',
+			name: 'returnEmptyItem',
+			type: 'boolean',
+			default: false,
+			description:
+				'Whether to output one item with found set to false and the query when there are no results, instead of no item',
+			displayOptions: { show: { '/resource': ['geocoding', 'place'], '/simplify': [true] } },
+		},
+		{
 			displayName: 'Timeout',
 			name: 'timeout',
 			type: 'number',
@@ -75,4 +84,13 @@ export const optionsCollection: INodeProperties = {
 			description: 'Request timeout in milliseconds',
 		},
 	],
+};
+
+export const simplifyProperty: INodeProperties = {
+	displayName: 'Simplify',
+	name: 'simplify',
+	type: 'boolean',
+	default: true,
+	description: 'Whether to return a simplified version of the response instead of the raw data',
+	displayOptions: { show: { resource: ['geocoding', 'place'] } },
 };

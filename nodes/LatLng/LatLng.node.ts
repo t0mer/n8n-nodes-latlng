@@ -6,7 +6,7 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
 import { route } from './actions/router';
-import { optionsCollection, resourceProperty } from './descriptions/common';
+import { optionsCollection, resourceProperty, simplifyProperty } from './descriptions/common';
 import { geocodingFields, geocodingOperations } from './descriptions/GeocodingDescription';
 import { placeFields, placeOperations } from './descriptions/PlaceDescription';
 
@@ -31,6 +31,7 @@ export class LatLng implements INodeType {
 			...geocodingFields,
 			...placeOperations,
 			...placeFields,
+			simplifyProperty,
 			optionsCollection,
 		],
 	};

@@ -27,8 +27,8 @@ describe('router', () => {
 			],
 			{
 				params: [
-					{ resource: 'geocoding', operation: 'forward', query: 'one' },
-					{ resource: 'geocoding', operation: 'forward', query: 'two' },
+					{ resource: 'geocoding', operation: 'forward', query: 'one', simplify: false },
+					{ resource: 'geocoding', operation: 'forward', query: 'two', simplify: false },
 				],
 			},
 		);
@@ -45,7 +45,7 @@ describe('router', () => {
 			{
 				params: [
 					{ resource: 'geocoding', operation: 'forward', query: 'bad' },
-					{ resource: 'geocoding', operation: 'forward', query: 'good' },
+					{ resource: 'geocoding', operation: 'forward', query: 'good', simplify: false },
 				],
 				continueOnFail: true,
 			},
@@ -77,6 +77,7 @@ describe('geocoding', () => {
 				operation: 'forward',
 				query: '  Dizengoff Square, Tel Aviv ',
 				maxResults: 1,
+				simplify: false,
 				options: { language: 'he' },
 			},
 		});
@@ -201,6 +202,91 @@ describe('place autosuggest and categories', () => {
 		});
 		const [out] = await run(ctx);
 		expect(calls[0].options.url).toBe('https://api.latlng.work/v1/places/categories');
-		expect(out[0].json).toEqual(body);
+		expect(out).toEqual([{ json: { name: 'cafe', count: 10 }, pairedItem: { item: 0 } }]);
+	});
+});
+
+describe('simplify and empty results', () => {
+	const featureCollection = {
+		type: 'FeatureCollection',
+		features: [
+			{
+				type: 'Feature',
+				geometry: { type: 'Point', coordinates: [34.774, 32.0779] },
+				properties: { name: 'Dizengoff Square', city: 'Tel Aviv', type: 'square' },
+			},
+			{
+				type: 'Feature',
+				geometry: { type: 'Point', coordinates: [34.78, 32.08] },
+				properties: { name: 'Other' },
+			},
+		],
+	};
+
+	it('splits geocoding features into flat items with lat/lon', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 200, body: featureCollection }], {
+			params: { resource: 'geocoding', operation: 'forward', query: 'x' },
+		});
+		const [out] = await run(ctx);
+		expect(out).toHaveLength(2);
+		expect(out[0]).toEqual({
+			json: {
+				name: 'Dizengoff Square',
+				lat: 32.0779,
+				lon: 34.774,
+				city: 'Tel Aviv',
+				type: 'square',
+			},
+			pairedItem: { item: 0 },
+		});
+	});
+
+	it('splits places into one item each', async () => {
+		const places = [
+			{ name: 'A', lat: 32.08, lon: 34.78, category: 'cafe', distance_m: 12 },
+			{ name: 'B', lat: 32.09, lon: 34.79, category: 'cafe', distance_m: 40 },
+		];
+		const { ctx } = fakeCtx([{ statusCode: 200, body: { type: 'nearby', count: 2, places } }], {
+			params: { resource: 'place', operation: 'nearby', latitude: 32.08, longitude: 34.78 },
+		});
+		const [out] = await run(ctx);
+		expect(out.map((o) => o.json)).toEqual(places);
+	});
+
+	it('returns nothing for zero results by default', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 200, body: { results: [] } }], {
+			params: { resource: 'place', operation: 'autosuggest', query: 'zzz' },
+		});
+		expect(await run(ctx)).toEqual([[]]);
+	});
+
+	it('returns a found:false item when Return Empty Item is on', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 200, body: { places: [] } }], {
+			params: {
+				resource: 'place',
+				operation: 'search',
+				query: 'zzz',
+				maxResults: 3,
+				options: { returnEmptyItem: true },
+			},
+		});
+		const [out] = await run(ctx);
+		expect(out).toEqual([
+			{ json: { found: false, query: { q: 'zzz', limit: 3 } }, pairedItem: { item: 0 } },
+		]);
+	});
+
+	it('returns the raw response as one item when Simplify is off', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 200, body: featureCollection }], {
+			params: {
+				resource: 'geocoding',
+				operation: 'reverse',
+				latitude: 32,
+				longitude: 34,
+				simplify: false,
+			},
+		});
+		const [out] = await run(ctx);
+		expect(out).toEqual([{ json: featureCollection, pairedItem: { item: 0 } }]);
 	});
 });

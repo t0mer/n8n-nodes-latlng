@@ -1,8 +1,9 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { toBbox, validateLatLon } from '../shared/coords';
-import { latlngRequest } from '../shared/transport';
-import { getOptions, requiredString, type Handler } from './common';
+import { extractors } from '../shared/mappers';
+import { cleanQs, latlngRequest } from '../shared/transport';
+import { getOptions, requiredString, shapeList, type Handler } from './common';
 
 function getFilters(ctx: IExecuteFunctions, i: number): IDataObject {
 	return ctx.getNodeParameter('filters', i, {}) as IDataObject;
@@ -40,7 +41,7 @@ export const search: Handler = async (ctx, i) => {
 		{ host: 'api', path: '/v1/places/search', qs, timeout },
 		i,
 	);
-	return [{ json: res.body }];
+	return shapeList(ctx, i, res, extractors.places, cleanQs(qs));
 };
 
 export const nearby: Handler = async (ctx, i) => {
@@ -63,7 +64,7 @@ export const nearby: Handler = async (ctx, i) => {
 		{ host: 'api', path: '/v1/places/nearby', qs, timeout },
 		i,
 	);
-	return [{ json: res.body }];
+	return shapeList(ctx, i, res, extractors.places, cleanQs(qs));
 };
 
 export const autosuggest: Handler = async (ctx, i) => {
@@ -99,7 +100,7 @@ export const autosuggest: Handler = async (ctx, i) => {
 		{ host: 'suggest', path: '/autosuggest', qs, timeout },
 		i,
 	);
-	return [{ json: res.body }];
+	return shapeList(ctx, i, res, extractors.suggestions, cleanQs(qs));
 };
 
 export const getCategories: Handler = async (ctx, i) => {
@@ -109,5 +110,5 @@ export const getCategories: Handler = async (ctx, i) => {
 		{ host: 'api', path: '/v1/places/categories', timeout },
 		i,
 	);
-	return [{ json: res.body }];
+	return shapeList(ctx, i, res, extractors.categories, {});
 };
