@@ -1,0 +1,52 @@
+{
+  "request": {
+    "host": "api",
+    "path": "/api",
+    "params": {
+      "q": "Dizengoff Square, Tel Aviv",
+      "limit": 1
+    },
+    "auth": "server"
+  },
+  "status": 200,
+  "contentType": "application/json",
+  "rateLimit": {
+    "limit": "3000",
+    "remaining": "2999"
+  },
+  "body": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "osm_type": "R",
+          "osm_id": 13645250,
+          "osm_key": "place",
+          "osm_value": "square",
+          "type": "locality",
+          "name": "כיכר דיזנגוף",
+          "district": "הצפון הישן - החלק הדרומי",
+          "city": "תל אביב–יפו",
+          "county": "נפת תל אביב",
+          "state": "מחוז תל אביב",
+          "country": "ישראל",
+          "countrycode": "IL",
+          "extent": [
+            34.7738809,
+            32.0782606,
+            34.7745159,
+            32.077723
+          ]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            34.7743493,
+            32.0779938
+          ]
+        }
+      }
+    ]
+  }
+}

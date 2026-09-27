@@ -1,0 +1,19 @@
+{
+  "request": {
+    "host": "tiles",
+    "path": "/v1/tiles/14/9774/6649.pbf",
+    "params": {},
+    "auth": "mapsQuery"
+  },
+  "status": 200,
+  "contentType": "application/x-protobuf",
+  "rateLimit": {
+    "limit": null,
+    "remaining": null
+  },
+  "body": {
+    "binary": true,
+    "bytes": 103736,
+    "magic": "1ac5da020a096275"
+  }
+}

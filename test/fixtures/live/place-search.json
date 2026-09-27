@@ -1,0 +1,60 @@
+{
+  "request": {
+    "host": "api",
+    "path": "/v1/places/search",
+    "params": {
+      "q": "cafe",
+      "lat": 32.0779,
+      "lon": 34.774,
+      "limit": 3
+    },
+    "auth": "server"
+  },
+  "status": 200,
+  "contentType": "application/json",
+  "rateLimit": {
+    "limit": null,
+    "remaining": "499"
+  },
+  "body": {
+    "type": "search",
+    "source": "photon_osm",
+    "query": "cafe",
+    "count": 3,
+    "places": [
+      {
+        "id": "7637925185",
+        "name": "Cafe",
+        "category": "cafe",
+        "lat": 32.0513964,
+        "lon": 34.7542677,
+        "country": "IL",
+        "region": "Tel-Aviv District",
+        "locality": "Tel Aviv",
+        "distance_m": 3488
+      },
+      {
+        "id": "432267222",
+        "name": "Cafe",
+        "category": "cafe",
+        "lat": 31.9663972,
+        "lon": 35.0991828,
+        "country": "PS",
+        "region": "West Bank",
+        "locality": "Al-Itihad",
+        "distance_m": 33089
+      },
+      {
+        "id": "432296048",
+        "name": "Cafe",
+        "category": "cafe",
+        "lat": 31.9012611,
+        "lon": 35.0638075,
+        "country": "PS",
+        "region": "West Bank",
+        "locality": "Saffa",
+        "distance_m": 33673
+      }
+    ]
+  }
+}
