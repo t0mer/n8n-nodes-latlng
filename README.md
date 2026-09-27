@@ -119,7 +119,12 @@ Use the `category` value in the Category filter.
 - **Style:** light, dark (default), grayscale, black, white or contrast.
 - **Markers:** latitude, longitude, color and a short label for each pin.
 - **Paths:** a line through two or more points, with weight (pixels), color and opacity (0–1).
-- **GeoJSON Overlay:** any GeoJSON object drawn on top of the map.
+- **GeoJSON Overlay:** any GeoJSON object to draw on top of the map.
+
+> **Current API behavior (checked September 2026):** the live API draws markers in the chosen color,
+> but it does not draw marker labels, paths or GeoJSON overlays. The request still succeeds; those
+> parts are just missing from the image. The node sends them as LatLng documents them, so they
+> should start working if the API adds support.
 
 The JSON part of the output holds the request parameters (never the key) plus `fileName`, `mimeType`
 and `fileSize`. If the request gets very long, for example with hundreds of markers, the API may reject
