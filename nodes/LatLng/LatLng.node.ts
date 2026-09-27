@@ -10,6 +10,12 @@ import { optionsCollection, resourceProperty, simplifyProperty } from './descrip
 import { geocodingFields, geocodingOperations } from './descriptions/GeocodingDescription';
 import { placeFields, placeOperations } from './descriptions/PlaceDescription';
 import { staticMapFields, staticMapOperations } from './descriptions/StaticMapDescription';
+import {
+	datasetFields,
+	datasetOperations,
+	tilesFields,
+	tilesOperations,
+} from './descriptions/TilesDescription';
 
 export class LatLng implements INodeType {
 	description: INodeTypeDescription = {
@@ -34,6 +40,10 @@ export class LatLng implements INodeType {
 			...placeFields,
 			...staticMapOperations,
 			...staticMapFields,
+			...tilesOperations,
+			...tilesFields,
+			...datasetOperations,
+			...datasetFields,
 			simplifyProperty,
 			optionsCollection,
 		],

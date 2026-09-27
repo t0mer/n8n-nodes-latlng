@@ -4,8 +4,10 @@ import type { Handler } from './common';
 import * as geocoding from './geocoding';
 import * as place from './place';
 import * as staticMap from './staticMap';
+import * as tiles from './tiles';
 
 const HANDLERS: Record<string, Record<string, Handler>> = {
+	dataset: { getMetadata: tiles.datasetGetMetadata, getTile: tiles.datasetGetTile },
 	geocoding: { forward: geocoding.forward, reverse: geocoding.reverse },
 	place: {
 		autosuggest: place.autosuggest,
@@ -14,6 +16,7 @@ const HANDLERS: Record<string, Record<string, Handler>> = {
 		search: place.search,
 	},
 	staticMap: { getImage: staticMap.getImage },
+	tile: { getMetadata: tiles.tilesGetMetadata, getTile: tiles.tilesGetTile },
 };
 
 function toNodeError(ctx: IExecuteFunctions, error: unknown, itemIndex: number) {

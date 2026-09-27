@@ -432,3 +432,115 @@ describe('static map', () => {
 		expect(calls).toHaveLength(0);
 	});
 });
+
+describe('tile and dataset', () => {
+	const withMapsKey = { apiKey: 'latlng_test', mapsKey: 'pk_latlng_testkey' };
+
+	it('requires a maps key and does not call the API without one', async () => {
+		const { ctx, calls } = fakeCtx([], { params: { resource: 'tile', operation: 'getMetadata' } });
+		await expect(run(ctx)).rejects.toThrow(/need a Maps key \(pk_latlng_…\)/);
+		expect(calls).toHaveLength(0);
+	});
+
+	it('tile metadata passes the key as a query param and redacts it from TileJSON', async () => {
+		const tilejson = {
+			tilejson: '3.0.0',
+			tiles: ['https://tiles.latlng.work/v1/tiles/{z}/{x}/{y}.pbf?key=pk_latlng_testkey'],
+			maxzoom: 14,
+		};
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: tilejson }], {
+			params: { resource: 'tile', operation: 'getMetadata' },
+			credentials: withMapsKey,
+		});
+		const [out] = await run(ctx);
+		expect(calls[0].credentialType).toBeUndefined();
+		expect(calls[0].options).toMatchObject({
+			url: 'https://tiles.latlng.work/v1/metadata',
+			qs: { key: 'pk_latlng_testkey' },
+		});
+		expect(out[0].json.tiles).toEqual([
+			'https://tiles.latlng.work/v1/tiles/{z}/{x}/{y}.pbf?key=REDACTED',
+		]);
+		expect(JSON.stringify(out)).not.toContain('pk_latlng_testkey');
+	});
+
+	it('vector tile returns protobuf binary named z-x-y.pbf', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: Buffer.from([0x1a, 0x02]) }], {
+			params: {
+				resource: 'tile',
+				operation: 'getTile',
+				z: 14,
+				x: 9774,
+				y: 6649,
+				binaryPropertyName: 'data',
+			},
+			credentials: withMapsKey,
+		});
+		const [out] = await run(ctx);
+		expect(calls[0].options).toMatchObject({
+			url: 'https://tiles.latlng.work/v1/tiles/14/9774/6649.pbf',
+			encoding: 'arraybuffer',
+		});
+		expect(out[0].binary?.data).toMatchObject({
+			fileName: '14-9774-6649.pbf',
+			mimeType: 'application/x-protobuf',
+		});
+		expect(out[0].json).toMatchObject({ z: 14, x: 9774, y: 6649, fileSize: 2 });
+	});
+
+	it.each([
+		[{ z: 2, x: 4, y: 0 }, /Column \(X\) must be a whole number from 0 to 3 at zoom 2/],
+		[{ z: 2, x: 0, y: -1 }, /Row \(Y\)/],
+		[{ z: 1.5, x: 0, y: 0 }, /Zoom/],
+	])('rejects tile coords %o', async (coords, pattern) => {
+		const { ctx, calls } = fakeCtx([], {
+			params: { resource: 'tile', operation: 'getTile', binaryPropertyName: 'data', ...coords },
+			credentials: withMapsKey,
+		});
+		await expect(run(ctx)).rejects.toThrow(pattern);
+		expect(calls).toHaveLength(0);
+	});
+
+	it('dataset tile uses the dataset path and caps zoom at 14', async () => {
+		const ok = fakeCtx([{ statusCode: 200, body: Buffer.from('x') }], {
+			params: {
+				resource: 'dataset',
+				operation: 'getTile',
+				datasetId: 'ds_abc123',
+				z: 3,
+				x: 1,
+				y: 2,
+				binaryPropertyName: 'data',
+			},
+			credentials: withMapsKey,
+		});
+		await run(ok.ctx);
+		expect(ok.calls[0].options.url).toBe(
+			'https://tiles.latlng.work/v1/datasets/ds_abc123/3/1/2.pbf',
+		);
+
+		const tooDeep = fakeCtx([], {
+			params: { resource: 'dataset', operation: 'getTile', datasetId: 'ds_1', z: 15, x: 0, y: 0 },
+			credentials: withMapsKey,
+		});
+		await expect(run(tooDeep.ctx)).rejects.toThrow(/Zoom must be a whole number from 0 to 14/);
+	});
+
+	it('dataset metadata rejects unsafe IDs', async () => {
+		const { ctx } = fakeCtx([], {
+			params: { resource: 'dataset', operation: 'getMetadata', datasetId: '../x' },
+			credentials: withMapsKey,
+		});
+		await expect(run(ctx)).rejects.toThrow(/Dataset ID may only contain/);
+	});
+
+	it('maps a 403 on the tiles host without echoing the key', async () => {
+		const { ctx } = fakeCtx([{ statusCode: 403, body: { error: 'Secret keys are rejected' } }], {
+			params: { resource: 'dataset', operation: 'getMetadata', datasetId: 'ds_1' },
+			credentials: withMapsKey,
+		});
+		const error = await run(ctx).catch((e) => e);
+		expect(error.message).toMatch(/^Key not allowed/);
+		expect(JSON.stringify(error)).not.toContain('pk_latlng_testkey');
+	});
+});

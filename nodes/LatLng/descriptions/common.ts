@@ -7,6 +7,11 @@ export const resourceProperty: INodeProperties = {
 	noDataExpression: true,
 	options: [
 		{
+			name: 'Dataset',
+			value: 'dataset',
+			description: 'Vector tiles and metadata of your uploaded datasets (needs a Maps key)',
+		},
+		{
 			name: 'Geocoding',
 			value: 'geocoding',
 			description: 'Convert addresses to coordinates and back',
@@ -20,6 +25,11 @@ export const resourceProperty: INodeProperties = {
 			name: 'Static Map',
 			value: 'staticMap',
 			description: 'Render a map image with markers, lines and GeoJSON',
+		},
+		{
+			name: 'Tile',
+			value: 'tile',
+			description: 'Base map vector tiles and TileJSON (needs a Maps key)',
 		},
 	],
 	default: 'geocoding',
