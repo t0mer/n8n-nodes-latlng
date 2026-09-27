@@ -8,6 +8,7 @@ import { NodeConnectionTypes } from 'n8n-workflow';
 import { route } from './actions/router';
 import { optionsCollection, resourceProperty } from './descriptions/common';
 import { geocodingFields, geocodingOperations } from './descriptions/GeocodingDescription';
+import { placeFields, placeOperations } from './descriptions/PlaceDescription';
 
 export class LatLng implements INodeType {
 	description: INodeTypeDescription = {
@@ -24,7 +25,14 @@ export class LatLng implements INodeType {
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'latLngApi', required: true }],
-		properties: [resourceProperty, ...geocodingOperations, ...geocodingFields, optionsCollection],
+		properties: [
+			resourceProperty,
+			...geocodingOperations,
+			...geocodingFields,
+			...placeOperations,
+			...placeFields,
+			optionsCollection,
+		],
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

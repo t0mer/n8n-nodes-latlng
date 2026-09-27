@@ -11,6 +11,11 @@ export const resourceProperty: INodeProperties = {
 			value: 'geocoding',
 			description: 'Convert addresses to coordinates and back',
 		},
+		{
+			name: 'Place',
+			value: 'place',
+			description: 'Search points of interest by name or proximity',
+		},
 	],
 	default: 'geocoding',
 };

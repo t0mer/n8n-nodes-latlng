@@ -106,3 +106,49 @@ describe('geocoding', () => {
 		});
 	});
 });
+
+describe('place search and nearby', () => {
+	it('search sends q, bias point, filters and limit', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: { places: [] } }], {
+			params: {
+				resource: 'place',
+				operation: 'search',
+				query: 'coffee',
+				maxResults: 5,
+				filters: { latitude: 32.08, longitude: 34.78, country: 'IL', category: 'cafe' },
+			},
+		});
+		await run(ctx);
+		expect(calls[0].options).toMatchObject({
+			url: 'https://api.latlng.work/v1/places/search',
+			qs: { q: 'coffee', lat: 32.08, lon: 34.78, country: 'IL', category: 'cafe', limit: 5 },
+		});
+	});
+
+	it('search rejects a half-set bias point', async () => {
+		const { ctx } = fakeCtx([], {
+			params: { resource: 'place', operation: 'search', query: 'x', filters: { latitude: 32 } },
+		});
+		await expect(run(ctx)).rejects.toThrow(/both Near Latitude and Near Longitude/);
+	});
+
+	it('nearby sends lat, lon, radius, category and limit', async () => {
+		const { ctx, calls } = fakeCtx([{ statusCode: 200, body: { places: [] } }], {
+			params: {
+				resource: 'place',
+				operation: 'nearby',
+				latitude: 32.08,
+				longitude: 34.78,
+				radius: 500,
+				maxResults: 5,
+				filters: { category: 'cafe' },
+			},
+		});
+		await run(ctx);
+		expect(calls[0].options).toMatchObject({
+			url: 'https://api.latlng.work/v1/places/nearby',
+			qs: { lat: 32.08, lon: 34.78, radius: 500, category: 'cafe', limit: 5 },
+		});
+		expect(calls[0].options.qs).not.toHaveProperty('country');
+	});
+});
