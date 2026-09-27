@@ -9,6 +9,8 @@ vi.mock('n8n-workflow', async (importOriginal) => ({
 	sleep: vi.fn(async () => {}),
 }));
 
+const fakeKey = (prefix: string) => prefix + 'x'.repeat(32);
+
 const fail = (statusCode: number, body: unknown = {}) => ({ statusCode, body });
 
 describe('latlngRequest', () => {
@@ -118,16 +120,18 @@ describe('cleanQs', () => {
 
 describe('keys in error bodies', () => {
 	it('never shows a key echoed by the API in the message or description', async () => {
-		const { ctx } = fakeCtx([{ statusCode: 400, body: { error: 'bad key latlng_Fake2' } }]);
+		const { ctx } = fakeCtx([
+			{ statusCode: 400, body: { error: `bad key ${fakeKey('latlng_')}` } },
+		]);
 		const e400 = await latlngRequest(ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
 		expect(e400.message).toBe('Bad request: bad key REDACTED');
 
 		const second = fakeCtx([
-			{ statusCode: 401, body: { message: 'Invalid API key pk_latlng_Fake3' } },
+			{ statusCode: 401, body: { message: `Invalid API key ${fakeKey('pk_latlng_')}` } },
 		]);
 		const e401 = await latlngRequest(second.ctx, { host: 'api', path: '/api' }, 0).catch((e) => e);
 		expect(e401.description).toBe('Invalid API key REDACTED');
-		expect(JSON.stringify(e401)).not.toMatch(/Fake3/);
+		expect(JSON.stringify(e401)).not.toContain('x'.repeat(32));
 	});
 });
 

@@ -1,184 +1,184 @@
 {
-  "request": {
-    "host": "api",
-    "path": "/v1/places/categories",
-    "params": {},
-    "auth": "server"
-  },
-  "status": 200,
-  "contentType": "application/json",
-  "rateLimit": {
-    "limit": null,
-    "remaining": null
-  },
-  "body": {
-    "count": 41,
-    "source": "osm_tags",
-    "categories": [
-      {
-        "category": "restaurant",
-        "osm_tag": "amenity:restaurant"
-      },
-      {
-        "category": "cafe",
-        "osm_tag": "amenity:cafe"
-      },
-      {
-        "category": "bar",
-        "osm_tag": "amenity:bar"
-      },
-      {
-        "category": "pub",
-        "osm_tag": "amenity:pub"
-      },
-      {
-        "category": "fast_food",
-        "osm_tag": "amenity:fast_food"
-      },
-      {
-        "category": "hotel",
-        "osm_tag": "tourism:hotel"
-      },
-      {
-        "category": "hostel",
-        "osm_tag": "tourism:hostel"
-      },
-      {
-        "category": "hospital",
-        "osm_tag": "amenity:hospital"
-      },
-      {
-        "category": "clinic",
-        "osm_tag": "amenity:clinic"
-      },
-      {
-        "category": "pharmacy",
-        "osm_tag": "amenity:pharmacy"
-      },
-      {
-        "category": "dentist",
-        "osm_tag": "amenity:dentist"
-      },
-      {
-        "category": "doctors",
-        "osm_tag": "amenity:doctors"
-      },
-      {
-        "category": "school",
-        "osm_tag": "amenity:school"
-      },
-      {
-        "category": "university",
-        "osm_tag": "amenity:university"
-      },
-      {
-        "category": "college",
-        "osm_tag": "amenity:college"
-      },
-      {
-        "category": "bank",
-        "osm_tag": "amenity:bank"
-      },
-      {
-        "category": "atm",
-        "osm_tag": "amenity:atm"
-      },
-      {
-        "category": "gas_station",
-        "osm_tag": "amenity:fuel"
-      },
-      {
-        "category": "parking",
-        "osm_tag": "amenity:parking"
-      },
-      {
-        "category": "supermarket",
-        "osm_tag": "shop:supermarket"
-      },
-      {
-        "category": "convenience",
-        "osm_tag": "shop:convenience"
-      },
-      {
-        "category": "shopping",
-        "osm_tag": "shop"
-      },
-      {
-        "category": "gym",
-        "osm_tag": "leisure:fitness_centre"
-      },
-      {
-        "category": "park",
-        "osm_tag": "leisure:park"
-      },
-      {
-        "category": "museum",
-        "osm_tag": "tourism:museum"
-      },
-      {
-        "category": "gallery",
-        "osm_tag": "tourism:gallery"
-      },
-      {
-        "category": "attraction",
-        "osm_tag": "tourism:attraction"
-      },
-      {
-        "category": "cinema",
-        "osm_tag": "amenity:cinema"
-      },
-      {
-        "category": "theatre",
-        "osm_tag": "amenity:theatre"
-      },
-      {
-        "category": "library",
-        "osm_tag": "amenity:library"
-      },
-      {
-        "category": "place_of_worship",
-        "osm_tag": "amenity:place_of_worship"
-      },
-      {
-        "category": "police",
-        "osm_tag": "amenity:police"
-      },
-      {
-        "category": "fire_station",
-        "osm_tag": "amenity:fire_station"
-      },
-      {
-        "category": "post_office",
-        "osm_tag": "amenity:post_office"
-      },
-      {
-        "category": "government_building",
-        "osm_tag": "office:government"
-      },
-      {
-        "category": "train_station",
-        "osm_tag": "railway:station"
-      },
-      {
-        "category": "bus_station",
-        "osm_tag": "amenity:bus_station"
-      },
-      {
-        "category": "charging_station",
-        "osm_tag": "amenity:charging_station"
-      },
-      {
-        "category": "toilets",
-        "osm_tag": "amenity:toilets"
-      },
-      {
-        "category": "playground",
-        "osm_tag": "leisure:playground"
-      },
-      {
-        "category": "marketplace",
-        "osm_tag": "amenity:marketplace"
-      }
-    ]
-  }
+	"request": {
+		"host": "api",
+		"path": "/v1/places/categories",
+		"params": {},
+		"auth": "server"
+	},
+	"status": 200,
+	"contentType": "application/json",
+	"rateLimit": {
+		"limit": null,
+		"remaining": null
+	},
+	"body": {
+		"count": 41,
+		"source": "osm_tags",
+		"categories": [
+			{
+				"category": "restaurant",
+				"osm_tag": "amenity:restaurant"
+			},
+			{
+				"category": "cafe",
+				"osm_tag": "amenity:cafe"
+			},
+			{
+				"category": "bar",
+				"osm_tag": "amenity:bar"
+			},
+			{
+				"category": "pub",
+				"osm_tag": "amenity:pub"
+			},
+			{
+				"category": "fast_food",
+				"osm_tag": "amenity:fast_food"
+			},
+			{
+				"category": "hotel",
+				"osm_tag": "tourism:hotel"
+			},
+			{
+				"category": "hostel",
+				"osm_tag": "tourism:hostel"
+			},
+			{
+				"category": "hospital",
+				"osm_tag": "amenity:hospital"
+			},
+			{
+				"category": "clinic",
+				"osm_tag": "amenity:clinic"
+			},
+			{
+				"category": "pharmacy",
+				"osm_tag": "amenity:pharmacy"
+			},
+			{
+				"category": "dentist",
+				"osm_tag": "amenity:dentist"
+			},
+			{
+				"category": "doctors",
+				"osm_tag": "amenity:doctors"
+			},
+			{
+				"category": "school",
+				"osm_tag": "amenity:school"
+			},
+			{
+				"category": "university",
+				"osm_tag": "amenity:university"
+			},
+			{
+				"category": "college",
+				"osm_tag": "amenity:college"
+			},
+			{
+				"category": "bank",
+				"osm_tag": "amenity:bank"
+			},
+			{
+				"category": "atm",
+				"osm_tag": "amenity:atm"
+			},
+			{
+				"category": "gas_station",
+				"osm_tag": "amenity:fuel"
+			},
+			{
+				"category": "parking",
+				"osm_tag": "amenity:parking"
+			},
+			{
+				"category": "supermarket",
+				"osm_tag": "shop:supermarket"
+			},
+			{
+				"category": "convenience",
+				"osm_tag": "shop:convenience"
+			},
+			{
+				"category": "shopping",
+				"osm_tag": "shop"
+			},
+			{
+				"category": "gym",
+				"osm_tag": "leisure:fitness_centre"
+			},
+			{
+				"category": "park",
+				"osm_tag": "leisure:park"
+			},
+			{
+				"category": "museum",
+				"osm_tag": "tourism:museum"
+			},
+			{
+				"category": "gallery",
+				"osm_tag": "tourism:gallery"
+			},
+			{
+				"category": "attraction",
+				"osm_tag": "tourism:attraction"
+			},
+			{
+				"category": "cinema",
+				"osm_tag": "amenity:cinema"
+			},
+			{
+				"category": "theatre",
+				"osm_tag": "amenity:theatre"
+			},
+			{
+				"category": "library",
+				"osm_tag": "amenity:library"
+			},
+			{
+				"category": "place_of_worship",
+				"osm_tag": "amenity:place_of_worship"
+			},
+			{
+				"category": "police",
+				"osm_tag": "amenity:police"
+			},
+			{
+				"category": "fire_station",
+				"osm_tag": "amenity:fire_station"
+			},
+			{
+				"category": "post_office",
+				"osm_tag": "amenity:post_office"
+			},
+			{
+				"category": "government_building",
+				"osm_tag": "office:government"
+			},
+			{
+				"category": "train_station",
+				"osm_tag": "railway:station"
+			},
+			{
+				"category": "bus_station",
+				"osm_tag": "amenity:bus_station"
+			},
+			{
+				"category": "charging_station",
+				"osm_tag": "amenity:charging_station"
+			},
+			{
+				"category": "toilets",
+				"osm_tag": "amenity:toilets"
+			},
+			{
+				"category": "playground",
+				"osm_tag": "leisure:playground"
+			},
+			{
+				"category": "marketplace",
+				"osm_tag": "amenity:marketplace"
+			}
+		]
+	}
 }

@@ -1,7 +1,10 @@
 const KEY_PARAM = /([?&](?:key|api_key)=)[^&#\s"']*/gi;
 const ENCODED_KEY_PARAM = /((?:%3F|%26)(?:key|api_key)%3D)(?:(?!%26|%23)[^&#\s"'])*/gi;
-/** Bare LatLng keys: server keys `latlng_…` and maps keys `pk_latlng_…`. */
-const BARE_KEY = /\b(?:pk_)?latlng_[A-Za-z0-9_-]+/g;
+/**
+ * Bare LatLng keys: `latlng_…` / `pk_latlng_…` followed by a long random suffix (32 characters in
+ * practice). The length threshold keeps API values like `latlng_places` intact.
+ */
+const BARE_KEY = /\b(?:pk_)?latlng_[A-Za-z0-9]{16,}/g;
 
 /** Replaces `key` / `api_key` query values and any bare LatLng key in a string with REDACTED. */
 export function redactUrls(text: string): string {

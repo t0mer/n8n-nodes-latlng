@@ -1,65 +1,65 @@
 {
-  "request": {
-    "host": "api",
-    "path": "/v1/places/nearby",
-    "params": {
-      "lat": 32.0779,
-      "lon": 34.774,
-      "radius": 500,
-      "category": "cafe",
-      "limit": 3
-    },
-    "auth": "server"
-  },
-  "status": 200,
-  "contentType": "application/json",
-  "rateLimit": {
-    "limit": null,
-    "remaining": "498"
-  },
-  "body": {
-    "type": "nearby",
-    "source": "latlng_places",
-    "center": {
-      "lat": 32.0779,
-      "lon": 34.774
-    },
-    "radius_m": 500,
-    "count": 3,
-    "places": [
-      {
-        "id": "13516609157",
-        "name": "Plaza Café",
-        "category": "cafe",
-        "lat": 32.0775717,
-        "lon": 34.7739451,
-        "country": "",
-        "region": "",
-        "locality": "",
-        "distance_m": 36.9
-      },
-      {
-        "id": "6771850686",
-        "name": "Jekyll and Hyde",
-        "category": "cafe",
-        "lat": 32.0775739,
-        "lon": 34.7738632,
-        "country": "",
-        "region": "",
-        "locality": "",
-        "distance_m": 38.5
-      },
-      {
-        "id": "13527184493",
-        "name": "Ilan's",
-        "category": "cafe",
-        "lat": 32.0775018,
-        "lon": 34.7741567,
-        "country": "",
-        "region": "",
-        "locality": "",
-        "distance_m": 46.7
-      }
-    ]
-  }
+	"request": {
+		"host": "api",
+		"path": "/v1/places/nearby",
+		"params": {
+			"lat": 32.0779,
+			"lon": 34.774,
+			"radius": 500,
+			"category": "cafe",
+			"limit": 3
+		},
+		"auth": "server"
+	},
+	"status": 200,
+	"contentType": "application/json",
+	"rateLimit": {
+		"limit": null,
+		"remaining": "498"
+	},
+	"body": {
+		"type": "nearby",
+		"source": "latlng_places",
+		"center": {
+			"lat": 32.0779,
+			"lon": 34.774
+		},
+		"radius_m": 500,
+		"count": 3,
+		"places": [
+			{
+				"id": "13516609157",
+				"name": "Plaza Café",
+				"category": "cafe",
+				"lat": 32.0775717,
+				"lon": 34.7739451,
+				"country": "",
+				"region": "",
+				"locality": "",
+				"distance_m": 36.9
+			},
+			{
+				"id": "6771850686",
+				"name": "Jekyll and Hyde",
+				"category": "cafe",
+				"lat": 32.0775739,
+				"lon": 34.7738632,
+				"country": "",
+				"region": "",
+				"locality": "",
+				"distance_m": 38.5
+			},
+			{
+				"id": "13527184493",
+				"name": "Ilan's",
+				"category": "cafe",
+				"lat": 32.0775018,
+				"lon": 34.7741567,
+				"country": "",
+				"region": "",
+				"locality": "",
+				"distance_m": 46.7
+			}
+		]
+	}
 }

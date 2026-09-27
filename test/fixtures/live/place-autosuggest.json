@@ -1,37 +1,37 @@
 {
-  "request": {
-    "host": "suggest",
-    "path": "/autosuggest",
-    "params": {
-      "q": "Dizengoff",
-      "lat": 32.0779,
-      "lon": 34.774,
-      "limit": 3
-    },
-    "auth": "server"
-  },
-  "status": 200,
-  "contentType": "application/json",
-  "rateLimit": {
-    "limit": "3000",
-    "remaining": "2999"
-  },
-  "body": {
-    "query": "Dizengoff",
-    "count": 1,
-    "timing_ms": 790,
-    "suggestions": [
-      {
-        "name": "דיזנגוף",
-        "type": "address",
-        "category": "street",
-        "lat": 32.0765505,
-        "lon": 34.7746435,
-        "distance_m": 162,
-        "country": "IL",
-        "city": "תל אביב–יפו",
-        "region": "מחוז תל אביב"
-      }
-    ]
-  }
+	"request": {
+		"host": "suggest",
+		"path": "/autosuggest",
+		"params": {
+			"q": "Dizengoff",
+			"lat": 32.0779,
+			"lon": 34.774,
+			"limit": 3
+		},
+		"auth": "server"
+	},
+	"status": 200,
+	"contentType": "application/json",
+	"rateLimit": {
+		"limit": "3000",
+		"remaining": "2999"
+	},
+	"body": {
+		"query": "Dizengoff",
+		"count": 1,
+		"timing_ms": 790,
+		"suggestions": [
+			{
+				"name": "דיזנגוף",
+				"type": "address",
+				"category": "street",
+				"lat": 32.0765505,
+				"lon": 34.7746435,
+				"distance_m": 162,
+				"country": "IL",
+				"city": "תל אביב–יפו",
+				"region": "מחוז תל אביב"
+			}
+		]
+	}
 }

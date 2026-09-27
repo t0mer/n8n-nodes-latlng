@@ -1,27 +1,27 @@
 {
-  "request": {
-    "host": "api",
-    "path": "/v1/static",
-    "params": {
-      "center": "34.774,32.0779",
-      "zoom": 15,
-      "width": 400,
-      "height": 300,
-      "style": "light",
-      "markers": "34.774,32.0779,e11d48,A|34.7755,32.0790,2563eb,B",
-      "path": "3:2563eb:0.8|34.774,32.0779|34.7755,32.0790"
-    },
-    "auth": "server"
-  },
-  "status": 200,
-  "contentType": "image/png",
-  "rateLimit": {
-    "limit": null,
-    "remaining": null
-  },
-  "body": {
-    "binary": true,
-    "bytes": 97215,
-    "magic": "89504e470d0a1a0a"
-  }
+	"request": {
+		"host": "api",
+		"path": "/v1/static",
+		"params": {
+			"center": "34.774,32.0779",
+			"zoom": 15,
+			"width": 400,
+			"height": 300,
+			"style": "light",
+			"markers": "34.774,32.0779,e11d48,A|34.7755,32.0790,2563eb,B",
+			"path": "3:2563eb:0.8|34.774,32.0779|34.7755,32.0790"
+		},
+		"auth": "server"
+	},
+	"status": 200,
+	"contentType": "image/png",
+	"rateLimit": {
+		"limit": null,
+		"remaining": null
+	},
+	"body": {
+		"binary": true,
+		"bytes": 97215,
+		"magic": "89504e470d0a1a0a"
+	}
 }

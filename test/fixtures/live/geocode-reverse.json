@@ -1,53 +1,45 @@
 {
-  "request": {
-    "host": "api",
-    "path": "/reverse",
-    "params": {
-      "lat": 32.0779,
-      "lon": 34.774
-    },
-    "auth": "server"
-  },
-  "status": 200,
-  "contentType": "application/json",
-  "rateLimit": {
-    "limit": "300",
-    "remaining": "299"
-  },
-  "body": {
-    "type": "FeatureCollection",
-    "features": [
-      {
-        "type": "Feature",
-        "properties": {
-          "osm_type": "W",
-          "osm_id": 1019049227,
-          "osm_key": "highway",
-          "osm_value": "tertiary",
-          "type": "street",
-          "name": "כיכר דיזנגוף (צינה)",
-          "district": "הצפון הישן - החלק הדרומי",
-          "city": "תל אביב–יפו",
-          "county": "נפת תל אביב",
-          "state": "מחוז תל אביב",
-          "country": "ישראל",
-          "postcode": "6356836",
-          "countrycode": "IL",
-          "extent": [
-            34.7738464,
-            32.0783884,
-            34.7742723,
-            32.0775822
-          ]
-        },
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            34.7738584,
-            32.0779111
-          ]
-        }
-      }
-    ]
-  }
+	"request": {
+		"host": "api",
+		"path": "/reverse",
+		"params": {
+			"lat": 32.0779,
+			"lon": 34.774
+		},
+		"auth": "server"
+	},
+	"status": 200,
+	"contentType": "application/json",
+	"rateLimit": {
+		"limit": "300",
+		"remaining": "299"
+	},
+	"body": {
+		"type": "FeatureCollection",
+		"features": [
+			{
+				"type": "Feature",
+				"properties": {
+					"osm_type": "W",
+					"osm_id": 1019049227,
+					"osm_key": "highway",
+					"osm_value": "tertiary",
+					"type": "street",
+					"name": "כיכר דיזנגוף (צינה)",
+					"district": "הצפון הישן - החלק הדרומי",
+					"city": "תל אביב–יפו",
+					"county": "נפת תל אביב",
+					"state": "מחוז תל אביב",
+					"country": "ישראל",
+					"postcode": "6356836",
+					"countrycode": "IL",
+					"extent": [34.7738464, 32.0783884, 34.7742723, 32.0775822]
+				},
+				"geometry": {
+					"type": "Point",
+					"coordinates": [34.7738584, 32.0779111]
+				}
+			}
+		]
+	}
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { redactDeep, redactUrls } from '../nodes/LatLng/shared/redact';
 
+/** Key-shaped fakes built at runtime, so no key-like literal is ever committed. */
+const fakeKey = (prefix: string) => prefix + 'x'.repeat(32);
+
 describe('redactUrls', () => {
 	it('redacts key and api_key query values anywhere in a string', () => {
 		expect(redactUrls('https://t.example/{z}/{x}/{y}.pbf?key=pk_latlng_abc123&style=dark')).toBe(
@@ -35,10 +38,14 @@ describe('redactDeep', () => {
 
 describe('bare and encoded keys', () => {
 	it('redacts bare server and maps keys in free text', () => {
-		expect(redactUrls('Invalid API key latlng_Fake1')).toBe('Invalid API key REDACTED');
-		expect(redactUrls('key pk_latlng_Zz9-_q not allowed for domain')).toBe(
+		expect(redactUrls(`Invalid API key ${fakeKey('latlng_')}`)).toBe('Invalid API key REDACTED');
+		expect(redactUrls(`key ${fakeKey('pk_latlng_')} not allowed for domain`)).toBe(
 			'key REDACTED not allowed for domain',
 		);
+	});
+
+	it('keeps API values like latlng_places', () => {
+		expect(redactUrls('source: latlng_places')).toBe('source: latlng_places');
 	});
 
 	it('redacts URL-encoded key params', () => {
@@ -48,7 +55,7 @@ describe('bare and encoded keys', () => {
 	});
 
 	it('redacts a key stored in its own TileJSON field', () => {
-		const fake = ['pk', 'latlng', 'secret99'].join('_');
+		const fake = fakeKey('pk_latlng_');
 		expect(redactDeep({ key: fake })).toEqual({ key: 'REDACTED' });
 	});
 });
