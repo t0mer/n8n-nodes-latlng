@@ -42,7 +42,7 @@ Create a **LatLng API** credential. You get keys from the LatLng dashboard at
 
 | Field | Key type | Needed for |
 |---|---|---|
-| **API Key (Server Key)**, required | `latlng_…` | Geocoding, Place, Static Map. Sent as the `X-Api-Key` header. |
+| **API Key (Server Key)**, required | `latlng_…` | Geocoding, Place (including Autosuggest), Static Map. Sent as the `X-Api-Key` header. |
 | **Maps Key**, optional | `pk_latlng_…` | Tile and Dataset. Sent as the `key` query parameter to the tiles host. |
 
 - Put the **server key** in the API Key field. A Maps key (`pk_latlng_…`) there makes the server-only
@@ -63,33 +63,50 @@ usable as an AI agent tool.
 | **Forward** | Address or place name → coordinates and address details. Returns up to *Max Results* matches (default 10), best first. |
 | **Reverse** | Latitude/longitude → the address at that point (street, city, postcode, country…). |
 
-Example output (Forward, *Simplify* on, one item per match; values are illustrative):
+Example output (Forward, *Simplify* on, one item per match). Without **Language**, names come back
+in the local language:
 
 ```json
 {
-  "name": "Dizengoff Square",
-  "lat": 32.0779,
-  "lon": 34.774,
-  "city": "Tel Aviv-Yafo",
-  "country": "Israel",
-  "type": "square"
+  "name": "כיכר דיזנגוף",
+  "lat": 32.0779938,
+  "lon": 34.7743493,
+  "osm_type": "R",
+  "osm_id": 13645250,
+  "osm_value": "square",
+  "type": "locality",
+  "city": "תל אביב–יפו",
+  "country": "ישראל",
+  "countrycode": "IL",
+  "extent": [34.7738809, 32.0782606, 34.7745159, 32.077723]
 }
 ```
+
+Reverse returns the same fields for the address at the point.
 
 ### Place
 
 | Operation | Description |
 |---|---|
 | **Autosuggest** | Completes a partial name (at least 2 characters) as you type. Optional filters: near point, radius, country and bounding box. Default 5 results, max 20. |
-| **Get Categories** | Lists every place category with its number of places. |
+| **Get Categories** | Lists every place category (about 40, e.g. `cafe`, `restaurant`, `pharmacy`). |
 | **Nearby** | Places within a radius (meters, default 1000, max 5000) of a point, nearest first. Optional category filter. |
 | **Search** | Places matching a name or keyword. Optional filters: near point, category and country. |
 
-Example output (Nearby, one item per place, `distance_m` in meters; values are illustrative):
+Example output (Nearby, one item per place, `distance_m` in meters):
 
 ```json
-{ "name": "Cafe Xoho", "lat": 32.0784, "lon": 34.7741, "category": "cafe", "distance_m": 57 }
+{ "id": "13516609157", "name": "Plaza Café", "category": "cafe", "lat": 32.0775717, "lon": 34.7739451, "distance_m": 36.9 }
 ```
+
+Example output (Autosuggest, one item per suggestion):
+
+```json
+{ "name": "דיזנגוף", "type": "address", "category": "street", "lat": 32.0765505, "lon": 34.7746435, "distance_m": 162, "country": "IL" }
+```
+
+Get Categories outputs one item per category, e.g. `{ "category": "cafe", "osm_tag": "amenity:cafe" }`.
+Use the `category` value in the Category filter.
 
 ### Static Map
 
@@ -113,7 +130,7 @@ it. The error then suggests fewer markers or a simpler GeoJSON.
 | Resource | Operation | Description |
 |---|---|---|
 | Tile | **Get Metadata** | TileJSON for the LatLng base map: bounds, zoom range, layers and attribution. |
-| Tile | **Get Vector Tile** | One Mapbox Vector Tile (`z`/`x`/`y`) as binary `application/x-protobuf`, named `{z}-{x}-{y}.pbf`. |
+| Tile | **Get Vector Tile** | One Mapbox Vector Tile (`z`/`x`/`y`, zoom 0–15) as binary `application/x-protobuf`, named `{z}-{x}-{y}.pbf`. |
 | Dataset | **Get Metadata** | TileJSON for one of your uploaded datasets. |
 | Dataset | **Get Vector Tile** | One vector tile of a dataset (zoom 0–14). |
 
@@ -181,7 +198,7 @@ npm run dev      # n8n with this node loaded, at http://localhost:5678
 
 `npm run smoke` calls each operation once against the real API, using keys from a local `.env` file
 (`LATLNG_API_KEY`, and optionally `LATLNG_MAPS_KEY`). It writes sanitized responses to
-`test/fixtures/live/`. It makes at most about 11 calls, so don't run it in a loop.
+`test/fixtures/live/`. It makes about 10 calls, so don't run it in a loop. Set `LATLNG_DATASET_ID` to also check a dataset.
 
 Releases are published by pushing a `YYYY.M.PATCH` tag. See `.github/workflows/publish.yml`.
 
