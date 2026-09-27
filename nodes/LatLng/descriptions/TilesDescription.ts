@@ -77,7 +77,8 @@ function tileFields(resource: TileResource, maxZoom: number): INodeProperties[] 
 	];
 }
 
-export const TILE_MAX_ZOOM = 22;
+/** The base map TileJSON reports maxzoom 15. */
+export const TILE_MAX_ZOOM = 15;
 export const DATASET_MAX_ZOOM = 14;
 
 export const tilesOperations = [operations('tile', 'the LatLng base map')];

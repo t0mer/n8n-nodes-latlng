@@ -646,3 +646,21 @@ describe('coverage gaps', () => {
 		expect(tileOut[0].json.rateLimit).toEqual({ limit: 3000, remaining: 42 });
 	});
 });
+
+describe('tile zoom', () => {
+	it('caps base map tiles at the TileJSON maxzoom (15)', async () => {
+		const { ctx, calls } = fakeCtx([], {
+			params: {
+				resource: 'tile',
+				operation: 'getTile',
+				z: 16,
+				x: 0,
+				y: 0,
+				binaryPropertyName: 'data',
+			},
+			credentials: { apiKey: 'latlng_test', mapsKey: 'pk_latlng_testkey' },
+		});
+		await expect(run(ctx)).rejects.toThrow(/Zoom must be a whole number from 0 to 15/);
+		expect(calls).toHaveLength(0);
+	});
+});
