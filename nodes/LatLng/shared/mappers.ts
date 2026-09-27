@@ -26,7 +26,8 @@ export const extractors = {
 	features: (body: IDataObject) =>
 		(body.type === 'Feature' ? [body] : asArray(body.features)).map(flattenFeature),
 	places: (body: IDataObject) => asArray(body.places),
-	suggestions: (body: IDataObject) => asArray(body.results),
+	/** The live API returns `suggestions`; the docs show `results`. */
+	suggestions: (body: IDataObject) => asArray(body.suggestions ?? body.results),
 	categories: (body: IDataObject) => asArray(body.categories),
 };
 
