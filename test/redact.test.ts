@@ -32,3 +32,23 @@ describe('redactDeep', () => {
 		expect(JSON.stringify(out)).not.toContain('pk_latlng_secret');
 	});
 });
+
+describe('bare and encoded keys', () => {
+	it('redacts bare server and maps keys in free text', () => {
+		expect(redactUrls('Invalid API key latlng_AbC123xyz')).toBe('Invalid API key REDACTED');
+		expect(redactUrls('key pk_latlng_Zz9-_q not allowed for domain')).toBe(
+			'key REDACTED not allowed for domain',
+		);
+	});
+
+	it('redacts URL-encoded key params', () => {
+		expect(redactUrls('u=https%3A%2F%2Fx%2Fa%3Fkey%3Dabc123%26z%3D1')).toBe(
+			'u=https%3A%2F%2Fx%2Fa%3Fkey%3DREDACTED%26z%3D1',
+		);
+	});
+
+	it('redacts a key stored in its own TileJSON field', () => {
+		const fake = ['pk', 'latlng', 'secret99'].join('_');
+		expect(redactDeep({ key: fake })).toEqual({ key: 'REDACTED' });
+	});
+});
