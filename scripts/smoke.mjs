@@ -157,7 +157,7 @@ await call(
 		['width', 400],
 		['height', 300],
 		['style', 'light'],
-		['markers', `${LON},${LAT},e11d48,A|34.7755,32.0790,2563eb,B`],
+		['markers', `${LON},${LAT},#e11d48,A|34.7755,32.0790,#2563eb,B`],
 		['path', `3:2563eb:0.8|${LON},${LAT}|34.7755,32.0790`],
 	],
 	{ binary: true },
