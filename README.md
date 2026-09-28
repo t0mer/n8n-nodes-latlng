@@ -21,7 +21,11 @@ images and fetches vector tiles and TileJSON, all based on OpenStreetMap data.
 
 ## Demo
 
-![LatLng node demo: geocode Dizengoff Square, find cafés nearby, draw a static map](https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo.gif)
+<video src="https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo.mp4" controls muted width="100%"></video>
+
+[![LatLng node demo: geocode Dizengoff Square, find cafés nearby, draw a static map. Click to play the video.](https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo-poster.png)](https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo.mp4)
+
+▶ [Watch the demo video (MP4, 43 s)](https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo.mp4)
 
 The workflow is in [`demo/workflow.json`](demo/workflow.json):
 1. **Geocoding → Forward** looks up "Dizengoff Square, Tel Aviv".
