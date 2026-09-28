@@ -134,7 +134,16 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          PACKAGE="$(node -p "require('./package.json').name")@${TAG#v}"
+          NAME="$(node -p "require('./package.json').name")"
+          PACKAGE="$NAME@${TAG#v}"
+          # After a package's first publish the registry answers 404 for its package document for
+          # several minutes, and the scanner fails until it appears. Wait for it (up to ~10 min).
+          DOC="https://registry.npmjs.org/$(node -p "encodeURIComponent(process.argv[1])" "$NAME")"
+          for i in $(seq 1 40); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' "$DOC")" = 200 ] && break
+            echo "Waiting for $NAME to appear on the registry ($i/40)"
+            sleep 15
+          done
           for attempt in 1 2 3 4 5; do
             OUTPUT="$(npx --yes @n8n/scan-community-package@0.37.0 "$PACKAGE" 2>&1 || true)"
             echo "$OUTPUT"
