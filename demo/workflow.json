@@ -1,0 +1,164 @@
+{
+	"name": "LatLng demo: Dizengoff Square cafés",
+	"nodes": [
+		{
+			"id": "a1",
+			"name": "Start",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0],
+			"parameters": {}
+		},
+		{
+			"id": "a2",
+			"name": "Geocode Address",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [240, 0],
+			"parameters": {
+				"resource": "geocoding",
+				"operation": "forward",
+				"query": "Dizengoff Square, Tel Aviv",
+				"maxResults": 1,
+				"options": {
+					"language": "en"
+				}
+			},
+			"credentials": {
+				"latLngApi": {
+					"id": "",
+					"name": "LatLng account"
+				}
+			}
+		},
+		{
+			"id": "a3",
+			"name": "Find Cafés Nearby",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [480, 0],
+			"parameters": {
+				"resource": "place",
+				"operation": "nearby",
+				"latitude": "={{ $json.lat }}",
+				"longitude": "={{ $json.lon }}",
+				"radius": 500,
+				"maxResults": 5,
+				"filters": {
+					"category": "cafe"
+				}
+			},
+			"credentials": {
+				"latLngApi": {
+					"id": "",
+					"name": "LatLng account"
+				}
+			}
+		},
+		{
+			"id": "a4",
+			"name": "Draw Map",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [720, 0],
+			"executeOnce": true,
+			"parameters": {
+				"resource": "staticMap",
+				"operation": "getImage",
+				"framing": "center",
+				"latitude": "={{ $('Geocode Address').first().json.lat }}",
+				"longitude": "={{ $('Geocode Address').first().json.lon }}",
+				"zoom": 15,
+				"width": 800,
+				"height": 500,
+				"style": "light",
+				"format": "png",
+				"markers": {
+					"marker": [
+						{
+							"latitude": "={{ $('Geocode Address').first().json.lat }}",
+							"longitude": "={{ $('Geocode Address').first().json.lon }}",
+							"color": "#e11d48",
+							"label": "D"
+						},
+						{
+							"latitude": "={{ $('Find Cafés Nearby').all()[0].json.lat }}",
+							"longitude": "={{ $('Find Cafés Nearby').all()[0].json.lon }}",
+							"color": "#2563eb",
+							"label": "1"
+						},
+						{
+							"latitude": "={{ $('Find Cafés Nearby').all()[1].json.lat }}",
+							"longitude": "={{ $('Find Cafés Nearby').all()[1].json.lon }}",
+							"color": "#2563eb",
+							"label": "2"
+						},
+						{
+							"latitude": "={{ $('Find Cafés Nearby').all()[2].json.lat }}",
+							"longitude": "={{ $('Find Cafés Nearby').all()[2].json.lon }}",
+							"color": "#2563eb",
+							"label": "3"
+						},
+						{
+							"latitude": "={{ $('Find Cafés Nearby').all()[3].json.lat }}",
+							"longitude": "={{ $('Find Cafés Nearby').all()[3].json.lon }}",
+							"color": "#2563eb",
+							"label": "4"
+						},
+						{
+							"latitude": "={{ $('Find Cafés Nearby').all()[4].json.lat }}",
+							"longitude": "={{ $('Find Cafés Nearby').all()[4].json.lon }}",
+							"color": "#2563eb",
+							"label": "5"
+						}
+					]
+				},
+				"binaryPropertyName": "data"
+			},
+			"credentials": {
+				"latLngApi": {
+					"id": "",
+					"name": "LatLng account"
+				}
+			}
+		}
+	],
+	"connections": {
+		"Start": {
+			"main": [
+				[
+					{
+						"node": "Geocode Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Geocode Address": {
+			"main": [
+				[
+					{
+						"node": "Find Cafés Nearby",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Find Cafés Nearby": {
+			"main": [
+				[
+					{
+						"node": "Draw Map",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"settings": {
+		"executionOrder": "v1"
+	}
+}

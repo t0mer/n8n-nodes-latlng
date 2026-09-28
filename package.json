@@ -38,7 +38,8 @@
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease",
     "test": "vitest run",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "demo:record": "node demo/record.mjs"
   },
   "files": [
     "dist"
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@n8n/node-cli": "*",
     "eslint": "9.32.0",
+    "playwright": "^1.63.0",
     "prettier": "3.6.2",
     "release-it": "^19.0.4",
     "typescript": "5.9.2",
