@@ -1,0 +1,131 @@
+{
+	"name": "LatLng: AI agent that finds places near an address",
+	"nodes": [
+		{
+			"parameters": {
+				"options": {}
+			},
+			"id": "0221dc02-cd8b-4426-9d27-c9814d822bbe",
+			"name": "When Chat Message Received",
+			"type": "@n8n/n8n-nodes-langchain.chatTrigger",
+			"typeVersion": 1.1,
+			"position": [0, 0],
+			"webhookId": "7756fbe7-1b51-4e45-9405-0da1df50e7f2"
+		},
+		{
+			"parameters": {
+				"options": {
+					"systemMessage": "You help users find places near an address, such as \"a pharmacy near Dizengoff Square\".\n\n1. Use the Geocode Address tool to turn the address the user mentions into latitude and longitude.\n2. Use the Find Nearby Places tool with those coordinates. Pass a category (for example cafe, restaurant, pharmacy, hotel) when the user asks for a type of place, and a radius in meters (max 5000).\n3. Answer with the place names, their category and the distance in meters (distance_m), nearest first.\n\nIf geocoding returns nothing, ask the user for a more specific address. Do not invent places the tools did not return. Mention that map data comes from OpenStreetMap contributors."
+				}
+			},
+			"id": "9ce15117-5669-43ea-b40f-78cbcc641559",
+			"name": "Places Agent",
+			"type": "@n8n/n8n-nodes-langchain.agent",
+			"typeVersion": 1.7,
+			"position": [260, 0]
+		},
+		{
+			"parameters": {
+				"model": {
+					"__rl": true,
+					"mode": "list",
+					"value": "gpt-4o-mini"
+				},
+				"options": {}
+			},
+			"id": "313427e1-eb50-4102-9535-5bd7971cfe05",
+			"name": "OpenAI Chat Model",
+			"type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+			"typeVersion": 1.2,
+			"position": [80, 220]
+		},
+		{
+			"parameters": {
+				"descriptionType": "manual",
+				"toolDescription": "Convert a free-text address or place name into coordinates. Returns name, lat, lon, city and country for the best match.",
+				"resource": "geocoding",
+				"operation": "forward",
+				"query": "={{ $fromAI('address', 'The address or place name to geocode, for example Dizengoff Square, Tel Aviv', 'string') }}",
+				"maxResults": 1,
+				"options": {
+					"language": "en"
+				}
+			},
+			"id": "8e560293-4dc0-4b0a-8c93-c75eb8b1fefa",
+			"name": "Geocode Address",
+			"type": "@t0mer/n8n-nodes-latlng.latLngTool",
+			"typeVersion": 1,
+			"position": [300, 220]
+		},
+		{
+			"parameters": {
+				"descriptionType": "manual",
+				"toolDescription": "List places within a radius of a point, nearest first. Returns name, category, lat, lon and distance_m (meters) per place.",
+				"resource": "place",
+				"operation": "nearby",
+				"latitude": "={{ $fromAI('latitude', 'Latitude of the center point in decimal degrees', 'number') }}",
+				"longitude": "={{ $fromAI('longitude', 'Longitude of the center point in decimal degrees', 'number') }}",
+				"radius": "={{ $fromAI('radius', 'Search radius as a whole number of meters, from 1 to 5000', 'number') }}",
+				"maxResults": 10,
+				"filters": {
+					"category": "={{ $fromAI('category', 'Optional place category such as cafe, restaurant, pharmacy or hotel; empty string for any', 'string') }}"
+				}
+			},
+			"id": "c3a66e8e-9fe2-41d3-9558-3d6ef29e12f8",
+			"name": "Find Nearby Places",
+			"type": "@t0mer/n8n-nodes-latlng.latLngTool",
+			"typeVersion": 1,
+			"position": [520, 220]
+		}
+	],
+	"connections": {
+		"When Chat Message Received": {
+			"main": [
+				[
+					{
+						"node": "Places Agent",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"OpenAI Chat Model": {
+			"ai_languageModel": [
+				[
+					{
+						"node": "Places Agent",
+						"type": "ai_languageModel",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Geocode Address": {
+			"ai_tool": [
+				[
+					{
+						"node": "Places Agent",
+						"type": "ai_tool",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Find Nearby Places": {
+			"ai_tool": [
+				[
+					{
+						"node": "Places Agent",
+						"type": "ai_tool",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"pinData": {},
+	"settings": {
+		"executionOrder": "v1"
+	}
+}

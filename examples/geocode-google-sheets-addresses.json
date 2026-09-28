@@ -1,0 +1,304 @@
+{
+	"name": "LatLng: geocode addresses from Google Sheets",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "74b2370a-4d28-4bf4-8902-567d20c9f6b8",
+			"name": "When Clicking 'Execute Workflow'",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"documentId": {
+					"__rl": true,
+					"mode": "url",
+					"value": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+				},
+				"sheetName": {
+					"__rl": true,
+					"mode": "list",
+					"value": "Sheet1",
+					"cachedResultName": "Sheet1"
+				},
+				"options": {}
+			},
+			"id": "742e73ba-03b4-4065-9549-00f848f3dc9b",
+			"name": "Read Addresses",
+			"type": "n8n-nodes-base.googleSheets",
+			"typeVersion": 4.5,
+			"position": [220, 0]
+		},
+		{
+			"parameters": {
+				"conditions": {
+					"options": {
+						"caseSensitive": true,
+						"leftValue": "",
+						"typeValidation": "loose",
+						"version": 2
+					},
+					"conditions": [
+						{
+							"id": "97280334-53c4-4ed6-9ec7-f49b1bb8fa54",
+							"leftValue": "={{ $json.address }}",
+							"rightValue": "",
+							"operator": {
+								"type": "string",
+								"operation": "notEmpty",
+								"singleValue": true
+							}
+						},
+						{
+							"id": "5269468f-b926-4140-8263-c1ad83a32493",
+							"leftValue": "={{ $json.lat }}",
+							"rightValue": "",
+							"operator": {
+								"type": "string",
+								"operation": "empty",
+								"singleValue": true
+							}
+						}
+					],
+					"combinator": "and"
+				},
+				"options": {}
+			},
+			"id": "a45f61fd-380a-4ae4-9f7d-6f9cee61830f",
+			"name": "Missing Coordinates?",
+			"type": "n8n-nodes-base.filter",
+			"typeVersion": 2.2,
+			"position": [440, 0]
+		},
+		{
+			"parameters": {
+				"resource": "geocoding",
+				"operation": "forward",
+				"query": "={{ $json.address }}",
+				"maxResults": 1,
+				"options": {
+					"returnEmptyItem": true,
+					"language": "en"
+				}
+			},
+			"id": "aa7e6048-acfc-452b-8cb9-fa464c616b11",
+			"name": "Geocode Address",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [660, 0],
+			"onError": "continueRegularOutput"
+		},
+		{
+			"parameters": {
+				"assignments": {
+					"assignments": [
+						{
+							"id": "5ca11b4a-9afd-485b-8988-642bbb7034fd",
+							"name": "address",
+							"value": "={{ $('Missing Coordinates?').item.json.address }}",
+							"type": "string"
+						},
+						{
+							"id": "11ca4aff-9188-45ef-a851-88d28aa3345b",
+							"name": "lat",
+							"value": "={{ $json.lat ?? '' }}",
+							"type": "string"
+						},
+						{
+							"id": "7bb066c8-cba1-410e-862c-a406ec185a3e",
+							"name": "lon",
+							"value": "={{ $json.lon ?? '' }}",
+							"type": "string"
+						},
+						{
+							"id": "5488cd67-8a24-4a6b-a0f9-43c271b4110b",
+							"name": "matched_name",
+							"value": "={{ $json.name ?? '' }}",
+							"type": "string"
+						},
+						{
+							"id": "f7774791-08f3-4561-82d8-d0261e5d3fb1",
+							"name": "city",
+							"value": "={{ $json.city ?? '' }}",
+							"type": "string"
+						},
+						{
+							"id": "893d9bf8-b333-47cf-8262-7d1506e0874d",
+							"name": "country",
+							"value": "={{ $json.countrycode ?? '' }}",
+							"type": "string"
+						},
+						{
+							"id": "6a2c81e3-3553-46bb-8b44-dcf33567ce18",
+							"name": "status",
+							"value": "={{ $json.error ? 'error: ' + $json.error : ($json.found === false ? 'not found' : 'ok') }}",
+							"type": "string"
+						}
+					]
+				},
+				"options": {}
+			},
+			"id": "c08ad35c-7987-48be-be1e-ad7dee898e1e",
+			"name": "Build Row",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 3.4,
+			"position": [880, 0]
+		},
+		{
+			"parameters": {
+				"operation": "update",
+				"documentId": {
+					"__rl": true,
+					"mode": "url",
+					"value": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+				},
+				"sheetName": {
+					"__rl": true,
+					"mode": "list",
+					"value": "Sheet1",
+					"cachedResultName": "Sheet1"
+				},
+				"columns": {
+					"mappingMode": "autoMapInputData",
+					"value": {},
+					"matchingColumns": [
+						"address"
+					],
+					"schema": [
+						{
+							"id": "address",
+							"displayName": "address",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "lat",
+							"displayName": "lat",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "lon",
+							"displayName": "lon",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "matched_name",
+							"displayName": "matched_name",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "city",
+							"displayName": "city",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "country",
+							"displayName": "country",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "status",
+							"displayName": "status",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						}
+					]
+				},
+				"options": {}
+			},
+			"id": "87884c03-91a2-43ae-b2fc-624647a907b4",
+			"name": "Write Coordinates",
+			"type": "n8n-nodes-base.googleSheets",
+			"typeVersion": 4.5,
+			"position": [1100, 0]
+		}
+	],
+	"connections": {
+		"When Clicking 'Execute Workflow'": {
+			"main": [
+				[
+					{
+						"node": "Read Addresses",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Read Addresses": {
+			"main": [
+				[
+					{
+						"node": "Missing Coordinates?",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Missing Coordinates?": {
+			"main": [
+				[
+					{
+						"node": "Geocode Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Geocode Address": {
+			"main": [
+				[
+					{
+						"node": "Build Row",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Build Row": {
+			"main": [
+				[
+					{
+						"node": "Write Coordinates",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"pinData": {},
+	"settings": {
+		"executionOrder": "v1"
+	}
+}

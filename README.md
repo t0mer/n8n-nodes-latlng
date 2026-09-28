@@ -183,6 +183,19 @@ You never need to know the order a particular endpoint expects, because the node
 Each output item is paired with its input item. With **Continue On Fail**, a failed item becomes
 `{ "error": "…", "statusCode": 401 }` and the rest of the batch keeps running.
 
+## Example workflows
+
+Import any of these from [`examples/`](examples/) with **Workflows → Import from File**. The
+addresses, spreadsheet URL and chat ID are placeholders; replace them with your own and select
+your LatLng (and Google Sheets, Telegram or OpenAI) credentials after importing.
+
+| File | What it does |
+|---|---|
+| [`geocode-google-sheets-addresses.json`](examples/geocode-google-sheets-addresses.json) | Reads addresses from Google Sheets, geocodes the rows that have no coordinates yet, and writes `lat`, `lon`, city, country and a status back to the sheet. |
+| [`reverse-geocode-webhook-location.json`](examples/reverse-geocode-webhook-location.json) | A webhook that takes `{ "lat": …, "lon": … }` and responds with the street address at that point. |
+| [`static-map-to-telegram.json`](examples/static-map-to-telegram.json) | Geocodes an address, renders a static map with a pin on it, and sends the image to a Telegram chat with an OpenStreetMap attribution caption. |
+| [`ai-agent-nearby-places-tool.json`](examples/ai-agent-nearby-places-tool.json) | An AI Agent that uses the node as two tools (geocoding and nearby places) to answer "find a pharmacy near Dizengoff Square". |
+
 ## Quota and errors
 
 - LatLng uses **one shared quota for all calls**: the free plan allows **3,000 calls per day**. Every

@@ -1,0 +1,135 @@
+{
+	"name": "LatLng: reverse geocode a location sent to a webhook",
+	"nodes": [
+		{
+			"parameters": {
+				"httpMethod": "POST",
+				"path": "reverse-geocode",
+				"responseMode": "responseNode",
+				"options": {}
+			},
+			"id": "20a058ad-a533-4d4c-b225-bc48258f128b",
+			"name": "Location Webhook",
+			"type": "n8n-nodes-base.webhook",
+			"typeVersion": 2,
+			"position": [0, 0],
+			"webhookId": "62c00348-12aa-4cf1-8d91-deb446c99b7b"
+		},
+		{
+			"parameters": {
+				"resource": "geocoding",
+				"operation": "reverse",
+				"latitude": "={{ $json.body.lat }}",
+				"longitude": "={{ $json.body.lon }}",
+				"options": {
+					"returnEmptyItem": true
+				}
+			},
+			"id": "6455ec1c-3acd-46e0-9b20-5b7980223cdb",
+			"name": "Reverse Geocode",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [220, 0]
+		},
+		{
+			"parameters": {
+				"assignments": {
+					"assignments": [
+						{
+							"id": "9ed73ab3-92ce-453f-ad57-10d9f44bea27",
+							"name": "found",
+							"value": "={{ $json.found !== false }}",
+							"type": "boolean"
+						},
+						{
+							"id": "9107206e-5212-4c50-a557-bf65098788b1",
+							"name": "address",
+							"value": "={{ [[$json.street, $json.housenumber].filter(Boolean).join(' '), $json.postcode, $json.city, $json.country].filter(Boolean).join(', ') }}",
+							"type": "string"
+						},
+						{
+							"id": "31ec26d3-672e-49fb-9cc1-fe55fe9a7820",
+							"name": "city",
+							"value": "={{ $json.city ?? null }}",
+							"type": "string"
+						},
+						{
+							"id": "b6c1e136-06da-4c3a-84ce-1614c5e3be3d",
+							"name": "countryCode",
+							"value": "={{ $json.countrycode ?? null }}",
+							"type": "string"
+						},
+						{
+							"id": "fb82a4b8-7d6d-456d-8980-b92678e7cd7b",
+							"name": "lat",
+							"value": "={{ $('Location Webhook').item.json.body.lat }}",
+							"type": "number"
+						},
+						{
+							"id": "71823177-3de0-4c61-9628-aed01fe2497c",
+							"name": "lon",
+							"value": "={{ $('Location Webhook').item.json.body.lon }}",
+							"type": "number"
+						}
+					]
+				},
+				"options": {}
+			},
+			"id": "0e08921f-6b5c-407e-81a7-08c7cbe9eb1e",
+			"name": "Format Address",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 3.4,
+			"position": [440, 0]
+		},
+		{
+			"parameters": {
+				"respondWith": "firstIncomingItem",
+				"options": {}
+			},
+			"id": "5cc72ce7-0b1d-40a3-b878-79f87db7b87f",
+			"name": "Respond with Address",
+			"type": "n8n-nodes-base.respondToWebhook",
+			"typeVersion": 1.1,
+			"position": [660, 0]
+		}
+	],
+	"connections": {
+		"Location Webhook": {
+			"main": [
+				[
+					{
+						"node": "Reverse Geocode",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Reverse Geocode": {
+			"main": [
+				[
+					{
+						"node": "Format Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Format Address": {
+			"main": [
+				[
+					{
+						"node": "Respond with Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"pinData": {},
+	"settings": {
+		"executionOrder": "v1"
+	}
+}

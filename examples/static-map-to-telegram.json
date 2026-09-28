@@ -1,0 +1,144 @@
+{
+	"name": "LatLng: send a map of an address to Telegram",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "be43433a-8b15-4431-96a5-e3d963cbf94d",
+			"name": "When Clicking 'Execute Workflow'",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"assignments": {
+					"assignments": [
+						{
+							"id": "7c752518-a84d-4021-8253-a818d212d4e6",
+							"name": "address",
+							"value": "Dizengoff Square, Tel Aviv",
+							"type": "string"
+						}
+					]
+				},
+				"options": {}
+			},
+			"id": "866d77f0-69f6-4619-bfae-cb9c5fdf2511",
+			"name": "Set Address",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 3.4,
+			"position": [220, 0]
+		},
+		{
+			"parameters": {
+				"resource": "geocoding",
+				"operation": "forward",
+				"query": "={{ $json.address }}",
+				"maxResults": 1,
+				"options": {
+					"language": "en"
+				}
+			},
+			"id": "56060975-c95c-4a3c-bbe0-a123b6d77ba0",
+			"name": "Geocode Address",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [440, 0]
+		},
+		{
+			"parameters": {
+				"resource": "staticMap",
+				"operation": "getImage",
+				"framing": "center",
+				"latitude": "={{ $json.lat }}",
+				"longitude": "={{ $json.lon }}",
+				"zoom": 16,
+				"width": 1024,
+				"height": 768,
+				"style": "light",
+				"format": "png",
+				"markers": {
+					"marker": [
+						{
+							"color": "#e11d48",
+							"latitude": "={{ $json.lat }}",
+							"longitude": "={{ $json.lon }}"
+						}
+					]
+				},
+				"binaryPropertyName": "data"
+			},
+			"id": "ca041dc0-8908-42ab-a7ad-185376565e80",
+			"name": "Render Map",
+			"type": "@t0mer/n8n-nodes-latlng.latLng",
+			"typeVersion": 1,
+			"position": [660, 0]
+		},
+		{
+			"parameters": {
+				"operation": "sendPhoto",
+				"chatId": "YOUR_CHAT_ID",
+				"binaryData": true,
+				"additionalFields": {
+					"caption": "={{ `📍 ${$('Geocode Address').item.json.name}, ${$('Geocode Address').item.json.city}\\nMap data © OpenStreetMap contributors` }}"
+				}
+			},
+			"id": "1a475a3a-d5b4-4031-a0a6-97998a11ed58",
+			"name": "Send Map to Telegram",
+			"type": "n8n-nodes-base.telegram",
+			"typeVersion": 1.2,
+			"position": [880, 0],
+			"webhookId": "93e085da-56e7-4fc1-8561-ef421ddb9143"
+		}
+	],
+	"connections": {
+		"When Clicking 'Execute Workflow'": {
+			"main": [
+				[
+					{
+						"node": "Set Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Set Address": {
+			"main": [
+				[
+					{
+						"node": "Geocode Address",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Geocode Address": {
+			"main": [
+				[
+					{
+						"node": "Render Map",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Render Map": {
+			"main": [
+				[
+					{
+						"node": "Send Map to Telegram",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"pinData": {},
+	"settings": {
+		"executionOrder": "v1"
+	}
+}
