@@ -7,7 +7,7 @@
 //    "LatLng account" credential through the REST API with LATLNG_API_KEY from .env.
 //    The key is never typed into or shown by the UI.
 // 3. Recording: pastes the workflow, runs it and opens each node's output.
-// 4. Stops n8n and converts the video to docs/demo.gif with ffmpeg.
+// 4. Stops n8n and converts the video to docs/demo.mp4 (plus docs/demo-poster.png) with ffmpeg.
 //
 // Costs 3 LatLng API calls per run. Plain .mjs on purpose: the node lint rules
 // (no process/console) apply to every .ts file in the repository.
@@ -34,10 +34,11 @@ const out = join(root, 'demo/output');
 // Outside the repo: n8n-node links the project into the user folder, so a folder inside it loops.
 const userFolder = join(homedir(), '.n8n-latlng-demo');
 const videoDir = join(out, 'video');
-const gif = join(root, 'docs/demo.gif');
+const mp4 = join(root, 'docs/demo.mp4');
+const poster = join(root, 'docs/demo-poster.png');
 const BASE = 'http://localhost:5678';
 const EMAIL = 'demo@example.com';
-const MAX_GIF_BYTES = 5 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 5 * 1024 * 1024;
 
 selectors.setTestIdAttribute('data-test-id');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -363,22 +364,33 @@ async function record(browser, state, credentialId) {
 	return video.path();
 }
 
-function toGif(webm) {
-	for (const [fps, width] of [
-		[12, 960],
-		[10, 960],
-		[10, 800],
-	]) {
-		const filter = `fps=${fps},scale=${width}:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse`;
-		const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-vf', filter, gif], {
-			stdio: 'inherit',
-		});
-		if (r.status !== 0) throw new Error('ffmpeg failed');
-		const size = statSync(gif).size;
-		console.log(`docs/demo.gif: ${(size / 1048576).toFixed(2)} MB at ${fps} fps, ${width}px`);
-		if (size <= MAX_GIF_BYTES) return;
-	}
-	throw new Error('GIF is still over 5 MB');
+function ffmpeg(args) {
+	const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
+	if (r.status !== 0) throw new Error(`ffmpeg failed: ${args.join(' ')}`);
+}
+
+/** H.264 MP4 that plays everywhere, plus a poster frame (the rendered map) for the README. */
+function toMp4(webm) {
+	ffmpeg([
+		'-i',
+		webm,
+		'-c:v',
+		'libx264',
+		'-crf',
+		'20',
+		'-preset',
+		'slow',
+		'-pix_fmt',
+		'yuv420p',
+		'-movflags',
+		'+faststart',
+		'-an',
+		mp4,
+	]);
+	ffmpeg(['-sseof', '-4', '-i', mp4, '-frames:v', '1', poster]);
+	const size = statSync(mp4).size;
+	console.log(`docs/demo.mp4: ${(size / 1048576).toFixed(2)} MB; poster: docs/demo-poster.png`);
+	if (size > MAX_VIDEO_BYTES) throw new Error('docs/demo.mp4 is over 5 MB');
 }
 
 const env = readEnv();
@@ -411,7 +423,7 @@ try {
 	const webm = await record(browser, state, credentialId);
 	const raw = join(out, 'demo.webm');
 	renameSync(webm, raw);
-	toGif(raw);
+	toMp4(raw);
 	console.log(`Raw video: ${raw} (${readdirSync(out).length} files in demo/output)`);
 } finally {
 	await browser?.close();
