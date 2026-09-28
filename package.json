@@ -1,7 +1,7 @@
 {
   "name": "@t0mer/n8n-nodes-latlng",
   "version": "2026.9.0",
-  "description": "n8n community node for LatLng — geocoding, reverse geocoding, places search and static maps",
+  "description": "n8n community node for the LatLng API: geocode and reverse geocode addresses, search places, and render static maps and vector tiles from OpenStreetMap data",
   "license": "MIT",
   "homepage": "https://github.com/t0mer/n8n-nodes-latlng#readme",
   "bugs": {
@@ -17,9 +17,13 @@
     "latlng",
     "geocoding",
     "reverse-geocoding",
+    "geocoder",
     "places",
+    "nearby-search",
     "static-maps",
-    "openstreetmap"
+    "vector-tiles",
+    "openstreetmap",
+    "maps"
   ],
   "author": {
     "name": "t0mer",
