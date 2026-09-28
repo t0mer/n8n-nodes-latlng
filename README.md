@@ -9,6 +9,7 @@ images and fetches vector tiles and TileJSON, all based on OpenStreetMap data.
 
 > **Unofficial.** This package is not affiliated with, endorsed by or supported by LatLng.
 
+- [Demo](#demo)
 - [Installation](#installation)
 - [Credentials](#credentials)
 - [Operations](#operations)
@@ -17,6 +18,17 @@ images and fetches vector tiles and TileJSON, all based on OpenStreetMap data.
 - [Quota and errors](#quota-and-errors)
 - [Attribution and usage terms](#attribution-and-usage-terms)
 - [Development](#development)
+
+## Demo
+
+![LatLng node demo: geocode Dizengoff Square, find cafés nearby, draw a static map](https://raw.githubusercontent.com/t0mer/n8n-nodes-latlng/main/docs/demo.gif)
+
+The workflow is in [`demo/workflow.json`](demo/workflow.json):
+1. **Geocoding → Forward** looks up "Dizengoff Square, Tel Aviv".
+2. **Place → Nearby** lists 5 cafés within 500 m of it.
+3. **Static Map → Get Image** draws the square (red) and the cafés (blue).
+
+Import the workflow and pick your LatLng credential in each LatLng node.
 
 ## Installation
 
